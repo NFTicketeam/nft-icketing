@@ -188,12 +188,26 @@ function App() {
 
         {myAddress === DEFAULT_ADDRESS ? (
         // {/* 로그인 전 화면 (지갑 연동하기) */}
-        <Alert
-          onClick={getUserData}
-          variant={"balance"}
-          style={{ backgroundColor: "#000000", color: '#FFFFFF', fontSize: 25, textAlign: "center" }}
-        >로그인
-        </Alert>
+          <>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <Card key={"login"}>
+            <Card.Img variant={"login"} src="https://ifh.cc/g/X5zBI9.png/72px72"/>
+            <Card.Title style={{fontSize:25}}>Connect</Card.Title>
+            <Card.Text>즐거운 NFT 모임 플랫폼</Card.Text>
+            <Card.Body>
+              <div className="d-grid gap-2" >
+                <Button onClick={getUserData}  variant={"login"} size="lg">
+                                        로그인                      
+                </Button>
+              </div>
+              <div/>
+            </Card.Body>
+          </Card>
+        </>
+
         ) : null }
 
         {/* 로그인 후 마켓 헤더 */}
@@ -222,7 +236,7 @@ function App() {
                       setNft(nfts[rowIndex * 2])
                     }}
                   >
-                    <Card.Img src={nfts[rowIndex * 2].uri.image} />
+                    <Card.Img src={nfts[rowIndex * 2].uri} />
                   </Card>
                   [{nfts[rowIndex * 2].id}]NFT
                 </Col>
@@ -235,7 +249,7 @@ function App() {
                         setNft(nfts[rowIndex * 2 + 1])
                       }}
                     >
-                      <Card.Img src={nfts[rowIndex * 2 + 1].uri.image} />
+                      <Card.Img src={nfts[rowIndex * 2 + 1].uri} />
                     </Card>
                   ) : null}
                   {nfts.length > rowIndex * 2 + 1 ? (
@@ -246,7 +260,6 @@ function App() {
             ))}
           </div>
         ) : null}
-
         {/* 상세 페이지 */}
         {myAddress !== DEFAULT_ADDRESS && tab === "DETAIL" ? (
           <div className="container" style={{ padding: 0, width: "100%" }}>
@@ -255,7 +268,7 @@ function App() {
             }}>
               <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} />
             </div>
-            <div><Image src={nft.uri.image} /></div>
+            <div><Image src={nft.uri} /></div>
             <div>
               {nft.uri.title} <br/>
               {nft.uri.category} <br/>
