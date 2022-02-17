@@ -1,10 +1,12 @@
 import Caver from "caver-js";
 import KIP17ABI from "../abi/KIP17TokenABI.json";
+import MarketABI from "../abi/MarketABI.json";
 import axios from "axios";
 import {
   ACCESS_KEY_ID,
   SECRET_ACCESS_KEY,
   NFT_CONTRACT_ADDRESS,
+  MARKET_CONTRACT_ADDRESS,
   CHAIN_ID,
 } from "../constants";
 const option = {
@@ -26,6 +28,13 @@ const caver = new Caver(
   )
 );
 const NFTContract = new caver.contract(KIP17ABI, NFT_CONTRACT_ADDRESS);
+const MarketContract = new caver.contract(MarketABI, MARKET_CONTRACT_ADDRESS);
+
+export const getPriceOf = async (tokenId) => {
+  const price = await MarketContract.methods.getPrice(tokenId).call();
+  console.log(`[PRICE] : ${price}`)
+  return price
+}
 
 export const fetchCardsOf = async (address) => {
   // Fetch Balance
