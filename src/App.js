@@ -3,7 +3,7 @@ import logo from "./logo.svg";
 import QRCode from "qrcode.react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faWallet, faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { getBalance, fetchCardsOf } from "./api/UseCaver";
+import { getBalance, fetchCardsOf, getPriceOf } from "./api/UseCaver";
 import * as KlipAPI from "./api/UseKlip";
 import * as KasAPI from "./api/UseKAS";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -21,7 +21,9 @@ import {
   Col,
   ButtonGroup,
   ToggleButton,
-  Image
+  Image,
+  InputGroup,
+  FormControl
 } from "react-bootstrap";
 import { MARKET_CONTRACT_ADDRESS } from "./constants";
 
@@ -30,19 +32,20 @@ const DEFAULT_ADDRESS = "0x00000000000000000000000000000";
 function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
-  const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
+  const [myAddress, setMyAddress] = useState("0xD70D4fCE9cdD0f27902b2e4e2032e31AC02B8c17");
   const [nft, setNft] = useState({id: '1', uri: ''});
 
   // UI
   const [qrvalue, setQrvalue] = useState(DEFAULT_QR_CODE);
   const [tab, setTab] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL
-  const [tabBefore, setTabBefore] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL
+  const [tabBefore, setTabBefore] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL, SELL
   // const [mintImageUrl, setMintImageUrl] = useState("");
   const [mintCategory, setMintCategory] = useState("dining");
   const [mintTitle, setMintTitle] = useState("");
   const [mintDatetime, setMintDatetime] = useState("");
   const [mintDescription, setMintDescription] = useState("");
   const [mintPlace, setMintPlace] = useState("");
+  const [sellPrice, setSellPrice] = useState("");
 
   const categories = [
     { name: '식사', value: 'dining' },
@@ -61,6 +64,11 @@ function App() {
   const rows = nfts.slice(nfts.length / 2);
   const fetchMarketNFTs = async () => {
     const _nfts = await fetchCardsOf(MARKET_CONTRACT_ADDRESS);
+    for (var nft of _nfts) {
+      const _price = await getPriceOf(nft.id);
+      nft.price = _price / 1000000000000000000;
+    }
+    
     setNfts(_nfts);
   };
 
@@ -108,7 +116,11 @@ function App() {
   };
 
   const onClickTransfer = (id) => {
-    if (tabBefore === "WALLET") {
+    if (tab === "SELL") {
+      if (sellPrice == "" || sellPrice <= 0) {
+        alert("금액을 정확히 입력해주세요.")
+        return
+      }
       setModalProps({
         title: "판매하시겠습니까?",
         onConfirm: () => {
@@ -116,6 +128,10 @@ function App() {
         },
       });
       setShowModal(true);
+    }
+    if (tabBefore === "WALLET") {
+      setTab("SELL")
+      setTabBefore("DETAIL")
     }
     if (tabBefore === "MARKET") {
       setModalProps({
@@ -129,7 +145,12 @@ function App() {
   };
 
   const onClickMyCard = (tokenId) => {
+    KlipAPI.sellCard(tokenId, sellPrice, setQrvalue, (result) => {
+      console.log(`sellCard : ${JSON.stringify(result)}`);
+    });
+    
     KlipAPI.listingCard(myAddress, tokenId, setQrvalue, (result) => {
+    // KlipAPI.sellCard(tokenId, sellPrice, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
       alert("판매 완료되었습니다.")
       setTab(tabBefore)
@@ -224,7 +245,8 @@ function App() {
                   >
                     <Card.Img src={nfts[rowIndex * 2].uri.image} />
                   </Card>
-                  [{nfts[rowIndex * 2].id}]NFT
+                  [{nfts[rowIndex * 2].id}]NFT <br/>
+                  {nfts[rowIndex * 2].price} KLAY
                 </Col>
                 <Col style={{ marginRight: 0, paddingRight: 0 }}>
                   {nfts.length > rowIndex * 2 + 1 ? (
@@ -239,7 +261,9 @@ function App() {
                     </Card>
                   ) : null}
                   {nfts.length > rowIndex * 2 + 1 ? (
-                    <>[{nfts[rowIndex * 2 + 1].id}]NFT</>
+                    <>[{nfts[rowIndex * 2 + 1].id}]NFT<br/>
+                    {nfts[rowIndex * 2].price} KLAY
+                    </> 
                   ) : null}
                 </Col>
               </Row>
@@ -275,6 +299,55 @@ function App() {
               }}
             >
               {tabBefore === "MARKET" ? "구매하기" : "판매하기"}
+            </Button>
+          </div>
+        ) : null}
+
+        {/* 판매 페이지 */}
+        {myAddress !== DEFAULT_ADDRESS && tab === "SELL" ? (
+          <div className="container" style={{ padding: 0, width: "100%" }}>
+            <div onClick={() => {
+              setTab(tabBefore)
+              setTabBefore("WALLET")
+            }}>
+              <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} />
+            </div>
+            <div>
+              <b>판매할 가격을 입력해주세요</b><br/>
+              <Form>
+                <span>판매 금액</span>
+                <InputGroup className="mb-3">
+                  <FormControl
+                    value={sellPrice}
+                    placeholder="0"
+                    type="number"
+                    onChange={(e) => {
+                      setSellPrice(e.target.value);
+                    }}
+                  />
+                  <InputGroup.Text id="basic-addon2">KLAY</InputGroup.Text>
+                </InputGroup>
+              </Form>
+            </div>
+            <p>
+              <span>가격 기준</span><br/>
+              <span>1 KLAY = 1500 원</span><br/>
+              <br/>
+              <span>티켓 정보</span><br/>
+              <span>{nft.uri.title}</span><br/>
+              <span>{nft.uri.description}</span><br/>
+            </p>
+            <Button
+              onClick={() => {
+                onClickTransfer(nft.id);
+              }}
+              variant="primary"
+              style={{
+                backgroundColor: "#000000",
+                borderColor: "#000000",
+              }}
+            >
+              판매하기
             </Button>
           </div>
         ) : null}
