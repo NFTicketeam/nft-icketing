@@ -3,7 +3,7 @@ import logo from "./logo.svg";
 import QRCode from "qrcode.react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faWallet, faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { getBalance, fetchCardsOf, getPriceOf } from "./api/UseCaver";
+import { getBalance, fetchCardsOf, getPriceOf, sellCardOf } from "./api/UseCaver";
 import * as KlipAPI from "./api/UseKlip";
 import * as KasAPI from "./api/UseKAS";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -144,13 +144,10 @@ function App() {
     }
   };
 
-  const onClickMyCard = (tokenId) => {
-    KlipAPI.sellCard(tokenId, sellPrice, setQrvalue, (result) => {
-      console.log(`sellCard : ${JSON.stringify(result)}`);
-    });
-    
+  const onClickMyCard = async (tokenId) => {    
+    await sellCardOf(tokenId, sellPrice);
+
     KlipAPI.listingCard(myAddress, tokenId, setQrvalue, (result) => {
-    // KlipAPI.sellCard(tokenId, sellPrice, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
       alert("판매 완료되었습니다.")
       setTab(tabBefore)
@@ -246,7 +243,7 @@ function App() {
                     <Card.Img src={nfts[rowIndex * 2].uri.image} />
                   </Card>
                   [{nfts[rowIndex * 2].id}]NFT <br/>
-                  {nfts[rowIndex * 2].price} KLAY
+                  {tab == "MARKET" ? ( <div>{nfts[rowIndex * 2].price} KLAY</div> ) : null}
                 </Col>
                 <Col style={{ marginRight: 0, paddingRight: 0 }}>
                   {nfts.length > rowIndex * 2 + 1 ? (
@@ -262,7 +259,7 @@ function App() {
                   ) : null}
                   {nfts.length > rowIndex * 2 + 1 ? (
                     <>[{nfts[rowIndex * 2 + 1].id}]NFT<br/>
-                    {nfts[rowIndex * 2].price} KLAY
+                    {tab == "MARKET" ? ( <div>{nfts[rowIndex * 2].price} KLAY</div> ) : null}
                     </> 
                   ) : null}
                 </Col>

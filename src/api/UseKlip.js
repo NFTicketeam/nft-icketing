@@ -17,25 +17,12 @@ const getKlipAccessUrl = (method, request_key) => {
 
 export const buyCard = async (tokenId, setQrvalue, callback) => {
   const functionJson =
-    '{ "constant": false, "inputs": [ { "name": "tokenId", "type": "uint256" }, { "name": "NFTAddress", "type": "address" } ], "name": "buyNFT", "outputs": [ { "name": "", "type": "bool" } ], "payable": true, "stateMutability": "payable", "type": "function" }';
+    '{ "constant": false, "inputs": [ { "name": "tokenId", "type": "uint256" }, { "name": "NFT", "type": "address" } ], "name": "buyNFT", "outputs": [ { "name": "", "type": "bool" } ], "payable": true, "stateMutability": "payable", "type": "function" }';
   executeContract(
     MARKET_CONTRACT_ADDRESS,
     functionJson,
     "10000000000000000",
     `[\"${tokenId}\",\"${NFT_CONTRACT_ADDRESS}\"]`,
-    setQrvalue,
-    callback
-  );
-};
-
-export const sellCard = async (tokenId, price, setQrvalue, callback) => {
-  const functionJson =
-    '{ "constant": false, "inputs": [ { "name": "tokenId", "type": "uint256" }, { "name": "price", "type": "uint256" } ], "name": "sellNFT", "outputs": [ { "name": "", "type": "bool" } ], "payable": true, "stateMutability": "payable", "type": "function" }';
-  executeContract(
-    MARKET_CONTRACT_ADDRESS,
-    functionJson,
-    "10000000000000000",
-    `[\"${tokenId}\",\"${price * 1000000000000000000}\"]`,
     setQrvalue,
     callback
   );
