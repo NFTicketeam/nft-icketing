@@ -36,6 +36,22 @@ export const getPriceOf = async (tokenId) => {
   return price
 }
 
+export const sellCardOf = async (tokenId, price) => {
+  try {
+    const privatekey = '0x9851da56f1d0d6369fe4b92b477f7fa702f509b2e80f1790ac40cd2aca3d05c4';
+    const deployer = caver.wallet.keyring.createFromPrivateKey(privatekey);
+    caver.wallet.add(deployer);
+
+    const receipt = await MarketContract.methods.sellNFT(tokenId, caver.utils.convertToPeb(price)).send({
+      from: deployer.address, // address
+      gas: "1000000"
+    })
+    console.log(receipt);
+  } catch(e) {
+    console.log(`[ERROR_SELL_CARD]${e}`);
+  }
+}
+
 export const fetchCardsOf = async (address) => {
   // Fetch Balance
   const balance = await NFTContract.methods.balanceOf(address).call();
