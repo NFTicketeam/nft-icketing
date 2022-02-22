@@ -154,8 +154,10 @@ function App() {
     });
   };
 
-  const onClickMarketCard = (tokenId) => {
-    KlipAPI.buyCard(tokenId, setQrvalue, (result) => {
+  const onClickMarketCard = async (tokenId) => {
+    const price = await getPriceOf(tokenId)
+
+    KlipAPI.buyCard(tokenId, price, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
       alert("구매 완료되었습니다.")
       setTab(tabBefore)
