@@ -207,7 +207,7 @@ function App() {
 
         {myAddress === DEFAULT_ADDRESS ? (
         // {/* 로그인 전 화면 (지갑 연동하기) */}
-        <div style={{textAlign:'center', marginTop:350, paddingRight:10}}>
+        <div style={{textAlign:'center', marginTop:250, paddingRight:10}}>
           <img src="drawable-mdpi/frame_79.png" style={{width:75, height:74}}/><br/><br/>
           <img src="drawable-mdpi/dine.png" style={{width:52, height:18}}/><br/><br/>
           <p>NFT와 함께하는 특별한 다이닝</p><br/><br/>
@@ -500,7 +500,7 @@ function App() {
       {/* 탭 */}
       {myAddress !== DEFAULT_ADDRESS ? (
       <nav
-        style={{ backgroundColor: "#1b1717", height: 45, width: 320 }}
+        style={{ backgroundColor: "white", height: 45, width: 360 }}
         className="navbar fixed-bottom navbar-light"
         role="navigation"
       >
@@ -513,10 +513,9 @@ function App() {
                 setQrvalue("DEFAULT")
               }}
               className="row d-flex flex-column justify-content-center align-items-center"
-              style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faHome} style={{ width: 120 }}/>
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faHome} style={{ width: 120 }}/>
               </div>
             </div>
             <div
@@ -525,10 +524,9 @@ function App() {
                 setQrvalue("DEFAULT")
               }}
               className="row d-flex flex-column justify-content-center align-items-center"
-              style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faPlus} style={{ width: 120 }} />
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faPlus} style={{ width: 120 }} />
               </div>
             </div>
             <div
@@ -538,10 +536,9 @@ function App() {
                 setQrvalue("DEFAULT")
               }}
               className="row d-flex flex-column justify-content-center align-items-center"
-              style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faWallet} style={{ width: 120 }} />
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faWallet} style={{ width: 120 }} />
               </div>
             </div>
           </div>
