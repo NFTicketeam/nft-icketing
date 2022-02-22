@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import logo from "./logo.svg";
 import QRCode from "qrcode.react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faWallet, faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -33,6 +32,7 @@ function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
   const [myAddress, setMyAddress] = useState("0xD70D4fCE9cdD0f27902b2e4e2032e31AC02B8c17");
+  // const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
   const [nft, setNft] = useState({id: '1', uri: ''});
 
   // UI
@@ -48,10 +48,9 @@ function App() {
   const [sellPrice, setSellPrice] = useState("");
 
   const categories = [
-    { name: '식사', value: 'dining' },
-    { name: '클래스', value: 'class' },
-    { name: '스터디', value: 'study' },
-    { name: '강연', value: 'lecture' }
+    { name: '식사권', value: 'dining' },
+    { name: '쿠킹 클래스', value: 'class' },
+    { name: '리미티드 예약', value: 'limited' }
   ];
 
   
@@ -208,12 +207,17 @@ function App() {
 
         {myAddress === DEFAULT_ADDRESS ? (
         // {/* 로그인 전 화면 (지갑 연동하기) */}
-        <Alert
-          onClick={getUserData}
-          variant={"balance"}
-          style={{ backgroundColor: "#000000", color: '#FFFFFF', fontSize: 25, textAlign: "center" }}
-        >로그인
-        </Alert>
+        <div style={{textAlign:'center', marginTop:350, paddingRight:10}}>
+          <img src="drawable-mdpi/frame_79.png" style={{width:75, height:74}}/><br/><br/>
+          <img src="drawable-mdpi/dine.png" style={{width:52, height:18}}/><br/><br/>
+          <p>NFT와 함께하는 특별한 다이닝</p><br/><br/>
+          <Alert
+            onClick={getUserData}
+            variant={"balance"}
+            style={{ backgroundColor: "#000000", color: '#FFFFFF', fontSize: 25, textAlign: "center", width:440 }}
+          >로그인
+          </Alert>
+        </div>
         ) : null }
 
         {/* 로그인 후 마켓 헤더 */}
@@ -456,11 +460,12 @@ function App() {
       {/* 모달 */}
       <Modal
         centered
-        size="sm"
+        size="lg"
         show={showModal}
         onHide={() => {
           setShowModal(false);
         }}
+        style={{textAlign:'center', margin:'auto'}}
       >
         <Modal.Header
           style={{ border: 0, backgroundColor: "#FFFFFF", opacity: 0.8 }}
@@ -476,7 +481,7 @@ function App() {
               modalProps.onConfirm();
               setShowModal(false);
             }}
-            style={{ backgroundColor: "#000000", borderColor: "#000000" }}
+            style={{ backgroundColor: "#000000", borderColor: "#000000", width:200, margin:"auto" }}
           >
             예
           </Button>
@@ -485,7 +490,7 @@ function App() {
             onClick={() => {
               setShowModal(false);
             }}
-            style={{ backgroundColor: "#E1E1E1", borderColor: "#E1E1E1", color: "#000000" }}
+            style={{ backgroundColor: "#E1E1E1", borderColor: "#E1E1E1", color: "#000000", width:200, margin:"auto" }}
           >
             아니요
           </Button>
@@ -495,7 +500,7 @@ function App() {
       {/* 탭 */}
       {myAddress !== DEFAULT_ADDRESS ? (
       <nav
-        style={{ backgroundColor: "#1b1717", height: 45 }}
+        style={{ backgroundColor: "#1b1717", height: 45, width: 480 }}
         className="navbar fixed-bottom navbar-light"
         role="navigation"
       >
@@ -508,9 +513,10 @@ function App() {
                 setQrvalue("DEFAULT")
               }}
               className="row d-flex flex-column justify-content-center align-items-center"
+              style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faHome} />
+                <FontAwesomeIcon color="white" size="lg" icon={faHome} style={{ width: 160 }}/>
               </div>
             </div>
             <div
@@ -519,9 +525,10 @@ function App() {
                 setQrvalue("DEFAULT")
               }}
               className="row d-flex flex-column justify-content-center align-items-center"
+              style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faPlus} />
+                <FontAwesomeIcon color="white" size="lg" icon={faPlus} style={{ width: 160 }} />
               </div>
             </div>
             <div
@@ -531,9 +538,10 @@ function App() {
                 setQrvalue("DEFAULT")
               }}
               className="row d-flex flex-column justify-content-center align-items-center"
+              style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faWallet} />
+                <FontAwesomeIcon color="white" size="lg" icon={faWallet} style={{ width: 160 }} />
               </div>
             </div>
           </div>

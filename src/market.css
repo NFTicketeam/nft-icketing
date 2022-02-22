@@ -13,6 +13,7 @@
   cursor: pointer;
   transition: 0.4s;
   border-color: black;
+  word-spacing: -2%;
 }
 .card-img {
   width: 100%;
