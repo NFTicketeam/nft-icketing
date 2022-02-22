@@ -211,12 +211,12 @@ function App() {
           <img src="drawable-mdpi/frame_79.png" style={{width:75, height:74}}/><br/><br/>
           <img src="drawable-mdpi/dine.png" style={{width:52, height:18}}/><br/><br/>
           <p>NFT와 함께하는 특별한 다이닝</p><br/><br/>
-          <Alert
+          <Button
             onClick={getUserData}
             variant={"balance"}
-            style={{ backgroundColor: "#000000", color: '#FFFFFF', fontSize: 25, textAlign: "center", width:440 }}
+            style={{ backgroundColor: "#000000", color: '#FFFFFF', fontSize: 25, textAlign: "center", width:340 }}
           >로그인
-          </Alert>
+          </Button>
         </div>
         ) : null }
 
@@ -481,7 +481,7 @@ function App() {
               modalProps.onConfirm();
               setShowModal(false);
             }}
-            style={{ backgroundColor: "#000000", borderColor: "#000000", width:200, margin:"auto" }}
+            style={{ backgroundColor: "#000000", borderColor: "#000000", width:160, margin:"auto" }}
           >
             예
           </Button>
@@ -490,7 +490,7 @@ function App() {
             onClick={() => {
               setShowModal(false);
             }}
-            style={{ backgroundColor: "#E1E1E1", borderColor: "#E1E1E1", color: "#000000", width:200, margin:"auto" }}
+            style={{ backgroundColor: "#E1E1E1", borderColor: "#E1E1E1", color: "#000000", width:160, margin:"auto" }}
           >
             아니요
           </Button>
@@ -500,7 +500,7 @@ function App() {
       {/* 탭 */}
       {myAddress !== DEFAULT_ADDRESS ? (
       <nav
-        style={{ backgroundColor: "#1b1717", height: 45, width: 480 }}
+        style={{ backgroundColor: "#1b1717", height: 45, width: 320 }}
         className="navbar fixed-bottom navbar-light"
         role="navigation"
       >
@@ -516,7 +516,7 @@ function App() {
               style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faHome} style={{ width: 160 }}/>
+                <FontAwesomeIcon color="white" size="lg" icon={faHome} style={{ width: 120 }}/>
               </div>
             </div>
             <div
@@ -528,7 +528,7 @@ function App() {
               style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faPlus} style={{ width: 160 }} />
+                <FontAwesomeIcon color="white" size="lg" icon={faPlus} style={{ width: 120 }} />
               </div>
             </div>
             <div
@@ -541,7 +541,7 @@ function App() {
               style={{ width: 160 }}
             >
               <div>
-                <FontAwesomeIcon color="white" size="lg" icon={faWallet} style={{ width: 160 }} />
+                <FontAwesomeIcon color="white" size="lg" icon={faWallet} style={{ width: 120 }} />
               </div>
             </div>
           </div>
