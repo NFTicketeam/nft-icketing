@@ -44,8 +44,8 @@ export const fetchCardsOf = async (address) => {
     const metadataUrl = await NFTContract.methods.tokenURI(tokenIds[i]).call(); // -> metadata
     const response = await axios.get(metadataUrl);
     const uriJSON = response.data;
-    //tokenUris.push(uriJSON);
-    tokenUris.push(metadataUrl);
+    tokenUris.push(uriJSON);
+    //tokenUris.push(metadataUrl);
   }
   const nfts = [];
   for (let i = 0; i < balance; i++) {
