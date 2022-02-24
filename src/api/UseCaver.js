@@ -70,6 +70,7 @@ export const fetchCardsOf = async (address) => {
     const response = await axios.get(metadataUrl);
     const uriJSON = response.data;
     tokenUris.push(uriJSON);
+    //tokenUris.push(metadataUrl);
   }
   const nfts = [];
   for (let i = 0; i < balance; i++) {

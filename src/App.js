@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import QRCode from "qrcode.react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faWallet, faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faWallet, faPlus, faArrowLeft, faAngleDown, faCheck,faSearch } from "@fortawesome/free-solid-svg-icons";
 import { getBalance, fetchCardsOf, getPriceOf, sellCardOf } from "./api/UseCaver";
 import * as KlipAPI from "./api/UseKlip";
 import * as KasAPI from "./api/UseKAS";
@@ -9,6 +9,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "./market.css";
 import {
+  Navbar,
+  Dropdown,
   Alert,
   Container,
   Card,
@@ -22,7 +24,7 @@ import {
   ToggleButton,
   Image,
   InputGroup,
-  FormControl
+  FormControl,
 } from "react-bootstrap";
 import { MARKET_CONTRACT_ADDRESS } from "./constants";
 
@@ -31,7 +33,7 @@ const DEFAULT_ADDRESS = "0x00000000000000000000000000000";
 function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
-  // const [myAddress, setMyAddress] = useState("0xD70D4fCE9cdD0f27902b2e4e2032e31AC02B8c17");
+  //const [myAddress, setMyAddress] = useState("0x257C15cA1DcDE9bc5512031331Ee1a51115d2491");
   const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
   const [nft, setNft] = useState({id: '1', uri: ''});
 
@@ -47,12 +49,26 @@ function App() {
   const [mintPlace, setMintPlace] = useState("");
   const [sellPrice, setSellPrice] = useState("");
 
+  const [searchText, setSearchText] = useState("");
+  const [categoryText, setCategoryText] = useState("카테고리");
+  const [filterText, setFilterText] = useState("등록순");
+
+
   const categories = [
     { name: '식사권', value: 'dining' },
     { name: '쿠킹 클래스', value: 'class' },
     { name: '리미티드 예약', value: 'limited' }
   ];
 
+  const [clickedCategory, setClickedCategory] = useState(0);
+  const [clickedFilter, setClickedFilter] = useState(1);
+  const [isCategory, setIsCategory] = useState(false);
+
+  const [showCategory, setShowCategory] = useState(false);
+  const [categoryModalProps, setCategoryModalProps] = useState({
+    title: "MODAL",
+    onConfirm: () => { },
+  });
   
   // Modal
   const [showModal, setShowModal] = useState(false);
@@ -69,6 +85,28 @@ function App() {
     }
     
     setNfts(_nfts);
+  };
+
+  const setSearch = async (searchText) => {
+    const _nfts = await fetchCardsOf(MARKET_CONTRACT_ADDRESS);
+    let _nft= _nfts;
+    for (var nft of _nft) {
+      const _price = await getPriceOf(nft.id);
+      nft.price = _price / 1000000000000000000;
+    }
+    if(!categoryText.includes("전체") && !categoryText.includes("카테고리")){
+      _nft = _nft.map(o =>
+       (o.uri.category.includes(categories.find(o => o.name === categoryText).value) ? o : null )).filter(o => (o !== null));
+    }
+    
+     if(searchText == '') {
+      setNfts(_nft);
+     }else{
+      _nft = _nft.map((o,idx)=>(o.uri.title.includes(searchText) ? o : null)).filter(o => (o !== null));
+      setNfts(_nft);
+     }
+
+
   };
 
   const fetchMyNFTs = async () => {
@@ -163,6 +201,16 @@ function App() {
     });
   };
 
+  const showCategoryModal = (text) => {
+    setCategoryModalProps({
+      title: text,
+      onConfirm: () => {
+      },
+    });
+    setShowCategory(true);
+  };
+
+
   const getUserData = () => {
     setModalProps({
       title: "Klip 지갑을 연동하시겠습니까?",
@@ -220,25 +268,78 @@ function App() {
         </div>
         ) : null }
 
-        {/* 로그인 후 마켓 헤더 */}
-        {myAddress !== DEFAULT_ADDRESS && tab === "MARKET" ? (
-        <div
-          style={{
-            fontSize: 15,
-            paddingLeft: 5,
-            marginTop: 10,
-          }}>
-          안녕하세요 :)<br/>
-          금주의 예약권을 확인해보세요!
-        </div>
+       {/* 로그인 후 마켓 헤더 */}
+       {myAddress !== DEFAULT_ADDRESS && tab === "MARKET" ? (
+          <>
+            <Container>
+              이번주<br />
+              인기있는 쿠킹클래스는?
+            </Container>
+            <Container>
+              <Form className="d-flex" value={searchText}>
+                  <FormControl
+                        value={searchText}
+                        placeholder="검색어를 입력해 주세요." 
+                        type="text"
+                        style={{ width: 200 }}
+                        onChange={(e) => {
+                          setSearchText(e.target.value);
+                        }}
+                      />
+                   <Button 
+                      size="sm"
+                      onClick={() => {setSearch(searchText)}} 
+                      >
+                      <FontAwesomeIcon 
+                      color="black" 
+                      size="1x" icon={faSearch} />
+                    </Button>
+                </Form>
+            </Container>
+            <Navbar>
+              <Container>
+                <Navbar.Text>
+                  Market
+                </Navbar.Text>
+                <Navbar.Collapse className="justify-content-end">
+                  <div>
+                    <Button 
+                      size="sm"
+                      onClick={() => {
+                      showCategoryModal("카테고리");
+                      setIsCategory(true);
+                    }} variant="category" >
+                      {categoryText}
+                      {'  '}
+                      <FontAwesomeIcon color="black" size="lg" icon={faAngleDown} />
+                    </Button>
+                    {'  '}
+                    <Button size="sm"
+                      onClick={() => {
+                      showCategoryModal("정렬");
+                      setIsCategory(false);
+                    }} variant="category" >
+                      {filterText}
+                      {'  '}
+                      <FontAwesomeIcon color="black" size="lg" icon={faAngleDown} />
+                    </Button>
+                  </div>
+                </Navbar.Collapse>
+              </Container>
+            </Navbar>
+          </>
+
         ) : null}
 
         {/* 갤러리(마켓, 내 지갑) */}
         {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET" || tab === "WALLET") ? (
           <div className="container" style={{ padding: 0, width: "100%" }}>
             {rows.map((o, rowIndex) => (
-              <Row key={`rowkey${rowIndex}`}>
+              
+              <>
+               <Row key={`rowkey${rowIndex}`}>
                 <Col style={{ marginRight: 0, paddingRight: 0 }}>
+                  {
                   <Card
                     onClick={() => {
                       tab === "MARKET" ? setTabBefore("MARKET") : setTabBefore("WALLET")
@@ -247,10 +348,15 @@ function App() {
                     }}
                   >
                     <Card.Img src={nfts[rowIndex * 2].uri.image} />
+                      
+                    <Card.Text>[{nfts[rowIndex * 2 ].uri.datetime}]</Card.Text>
+                      <Card.Text>[{nfts[rowIndex * 2].uri.title}]</Card.Text>
+                      <Card.Text>[{nfts[rowIndex * 2].price}]KLAY</Card.Text>
+                      <Card.Text>[{nfts[rowIndex * 2].uri.place}]</Card.Text>
                   </Card>
-                  [{nfts[rowIndex * 2].id}]NFT <br/>
-                  {tab == "MARKET" ? ( <div>{nfts[rowIndex * 2].price} KLAY</div> ) : null}
+                  }
                 </Col>
+                  
                 <Col style={{ marginRight: 0, paddingRight: 0 }}>
                   {nfts.length > rowIndex * 2 + 1 ? (
                     <Card
@@ -261,16 +367,20 @@ function App() {
                       }}
                     >
                       <Card.Img src={nfts[rowIndex * 2 + 1].uri.image} />
+                      
+                      <Card.Text>[{nfts[rowIndex * 2 + 1].uri.datetime}]</Card.Text>
+                      <Card.Text>[{nfts[rowIndex * 2 + 1].uri.title}]</Card.Text>
+                      <Card.Text>[{nfts[rowIndex * 2 + 1].price}]KLAY</Card.Text>
+                      <Card.Text>[{nfts[rowIndex * 2 + 1].uri.place}]</Card.Text>
                     </Card>
-                  ) : null}
-                  {nfts.length > rowIndex * 2 + 1 ? (
-                    <>[{nfts[rowIndex * 2 + 1].id}]NFT<br/>
-                    {tab == "MARKET" ? ( <div>{nfts[rowIndex * 2].price} KLAY</div> ) : null}
-                    </> 
                   ) : null}
                 </Col>
               </Row>
-            ))}
+              </>
+              
+            )
+            
+            )} 
           </div>
         ) : null}
 
@@ -460,12 +570,11 @@ function App() {
       {/* 모달 */}
       <Modal
         centered
-        size="lg"
+        size="sm"
         show={showModal}
         onHide={() => {
           setShowModal(false);
         }}
-        style={{textAlign:'center', margin:'auto'}}
       >
         <Modal.Header
           style={{ border: 0, backgroundColor: "#FFFFFF", opacity: 0.8 }}
@@ -473,7 +582,7 @@ function App() {
           <Modal.Title>{modalProps.title}</Modal.Title>
         </Modal.Header>
         <Modal.Footer
-          style={{ border: 0, backgroundColor: "#FFFFFF", opacity: 0.8, margin:"auto" }}
+          style={{ border: 0, backgroundColor: "#FFFFFF", opacity: 0.8, margin: "auto" }}
         >
           <Button
             variant="primary"
@@ -481,7 +590,7 @@ function App() {
               modalProps.onConfirm();
               setShowModal(false);
             }}
-            style={{ backgroundColor: "#000000", borderColor: "#000000", width:160, margin:"auto" }}
+            style={{ backgroundColor: "#000000", borderColor: "#000000" }}
           >
             예
           </Button>
@@ -490,12 +599,98 @@ function App() {
             onClick={() => {
               setShowModal(false);
             }}
-            style={{ backgroundColor: "#E1E1E1", borderColor: "#E1E1E1", color: "#000000", width:160, margin:"auto" }}
+            style={{ backgroundColor: "#E1E1E1", borderColor: "#E1E1E1", color: "#000000" }}
           >
             아니요
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <Modal
+        centered
+        size="lg"
+        show={showCategory}
+        onHide={() => {
+          setShowCategory(false);
+        }}
+      >
+        <Modal.Header
+          style={{ border: 0, backgroundColor: "#FFFFFF", opacity: 0.8 }}
+        >
+          <Modal.Title>{categoryModalProps.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Footer
+          style={{ border: 0, backgroundColor: "#FFFFFF", opacity: 0.8, margin: "auto" }}
+        >
+          <Nav defaultActiveKey="/home" className="flex-column">
+            {(isCategory === true) ?
+             <> <Button 
+             onClick={() => {
+               setShowCategory(false);
+               setClickedCategory(0);
+               setCategoryText("전체");
+             }}>
+               전체 {'  '}
+               {(clickedCategory===0) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+           </Button>
+           <br />
+           <Button 
+              onClick={() => {
+                setShowCategory(false);
+                setClickedCategory(1);
+                setCategoryText("식사권");
+              }}>
+                식사권 {'  '}
+                {(clickedCategory===1) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+            </Button>
+            <br />
+            <Button
+              onClick={() => {
+                 setShowCategory(false);
+                 setClickedCategory(2);
+                 setCategoryText("쿠킹 클래스");
+                }}>
+                쿠킹 클래스 {'  '}
+                {(clickedCategory===2) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+
+            </Button>
+            <br />
+            <Button
+              onClick={() => {
+                setShowCategory(false);
+                setClickedCategory(3);
+                setCategoryText("리미티드 예약");
+                }}>
+                리미티드 예약 {'  '}
+                {(clickedCategory===3) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+            </Button>
+            </> : //null 
+            <>
+            <Button 
+              onClick={() => {
+                setShowCategory(false);
+                setClickedFilter(1);
+                setFilterText("등록순");
+              }}>
+                등록순 {'  '}
+                {(clickedFilter===1) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+            </Button>
+            <br />
+            <Button
+              onClick={() => {
+                 setShowCategory(false);
+                 setClickedFilter(2);
+                 setFilterText("마감순");
+                }}>
+                마감순 {'  '}
+                {(clickedFilter===2) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+
+            </Button>
+            </>
+            }
+          </Nav>
+        </Modal.Footer>
+      </Modal>  
 
       {/* 탭 */}
       {myAddress !== DEFAULT_ADDRESS ? (
