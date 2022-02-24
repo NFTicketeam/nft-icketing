@@ -240,20 +240,20 @@ function App() {
     <div className="App">
       <div style={{ padding: 10 }}>
 
-        {tab === "WALLET" ? (
+        {tab === "WALLET" && walletDp === 'WALLET' ? (
         // {/* 주소 잔고 */}
         <Fragment>
           <div style={{display:"flex", marginTop:"10%", minHeight:"100px"}}>
-            <div style={{ width: "25%"}}><Card.img src={nfts[0].uri.image} /></div>
+            <div style={{ width: "25%"}}> 사진 </div>
             <div style={{ width: "65%"}}><div style={{fontSize:"20sp", color:"#2d2d2d"}}>홍길동</div><div style={{fontSize:"3px", color:"#5e5e5e"}}>{myAddress}</div>
             </div>
           </div>
           <div
               style={{
                 backgroundColor: "#f5f5f5",
-                minHeight: "130px",
+                minHeight: "110px",
                 marginTop: "10%",
-                padding: "8% 1%"
+                padding: "10% 2%"
               }}
           >
             <div>
@@ -399,24 +399,23 @@ function App() {
 
           <div className="container" style={{ padding: 0, width: "100%" }}>
             {rows.map((o, rowIndex) => (
-              
               <>
                <Row key={`rowkey${rowIndex}`}>
                 <Col style={{ marginRight: 0, paddingRight: 0 }}>
                   {
                   <Card
+                    style={{ padding: "2%"}}
                     onClick={() => {
                       tab === "MARKET" ? setTabBefore("MARKET") : setTabBefore("WALLET")
                       setTab("DETAIL")
                       setNft(nfts[rowIndex * 2])
                     }}
                   >
-                    <Card.Img src={nfts[rowIndex * 2].uri.image} />
-                      
-                    <Card.Text>[{nfts[rowIndex * 2 ].uri.datetime}]</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2].uri.title}]</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2].price}]KLAY</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2].uri.place}]</Card.Text>
+                    <Card.Img src={nfts[rowIndex * 2].uri.image} />  
+                    <Card.Text style={{ color:"#f5f5f5", backgroundColor:"#252525", padding: "2%", borderRadius:"40px", marginTop: "2%", maxWidth:"120px"}}>■ {nfts[rowIndex * 2 ].uri.datetime}</Card.Text>
+                    <Card.Text style={{ color: "#000000", fontSize:"13sp", textAlign:"left"}}>{nfts[rowIndex * 2].uri.title}</Card.Text>
+                    <Card.Text style={{ color: "#34cd75", fontSize:"12sp", textAlign:"left", fontWeight:"bold"}}>{nfts[rowIndex * 2].price | 0 } KLAY ~</Card.Text>
+                    <Card.Text style={{ color: "#6f6f6e", fontSize:"10sp", textAlign:"left"}}>{nfts[rowIndex * 2].uri.place}</Card.Text>
                   </Card>
                   }
                 </Col>
@@ -443,7 +442,6 @@ function App() {
               </>
               
             )
-            
             )} 
           </div>
         </Fragment>
@@ -459,13 +457,24 @@ function App() {
               <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} />
             </div>
             <div><Image src={nft.uri.image} /></div>
-            <div>
-              {nft.uri.title} <br/>
-              {nft.uri.category} <br/>
-              {nft.uri.datetime} <br/>
-              {nft.uri.description} <br/>
-              {nft.uri.place} <br/>
-              {nft.id}
+            <div className="nftDetailContent">
+              <div style={{color:"#2d2d2d", fontSize:"25px", fontWeight:"600", marginBottom:"5%"}}> {nft.uri.title}</div>
+              <div style={{display:"flex", justifyContent:"space-between"}}>
+                 <div>장소</div> 
+                 <div style={{color:"#34cd75", fontSize:"15px", fontWeight:"600", textAlign:"right"}}>50 KLAY ~</div>
+              </div>
+              <div className="borderLine"></div>
+
+              <div><label className="detailLb">상세정보</label><span className="detailCont">{nft.uri.description}</span></div>
+              <div><label className="detailLb">카테고리</label><span className="detailCont"><span className="detailCont">{nft.uri.category}</span></span></div>
+              <div><label className="detailLb">위치</label><span className="detailCont">{nft.uri.place}</span></div>
+              <div className="borderLine"></div>
+
+              <div style={{color:"#000000", fontSize:"20px",  fontWeight:"600", marginTop:"2%"}}> 발행정보 </div>
+
+                <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">발행일</label><span className="detailCont">{nft.uri.datetime}</span></div>
+                <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">토큰ID</label><span className="detailCont">{nft.id}</span></div>
+                <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">컨트랙트 주소</label><span className="detailCont">0x12030123y20450</span></div>
             </div>
             <Button
               onClick={() => {
