@@ -41,8 +41,9 @@ function App() {
   const [qrvalue, setQrvalue] = useState(DEFAULT_QR_CODE);
   const [tab, setTab] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL
   const [tabBefore, setTabBefore] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL, SELL
-  // const [mintImageUrl, setMintImageUrl] = useState("");
+  const [mintImageUrl, setMintImageUrl] = useState("");
   const [mintCategory, setMintCategory] = useState("dining");
+  const [mintName, setMintName] = useState("");
   const [mintTitle, setMintTitle] = useState("");
   const [mintDatetime, setMintDatetime] = useState("");
   const [mintDescription, setMintDescription] = useState("");
@@ -118,23 +119,23 @@ function App() {
     setNfts(_nfts);
   };
 
-  const onClickMintButton = (image, category, title, datetime, description, place) => {
+  const onClickMintButton = (image, name, category, title, datetime, description, place) => {
     setModalProps({
       title: "발행하시겠습니까?",
       onConfirm: () => {
-        onClickMint(image, category, title, datetime, description, place);
+        onClickMint(image, name, category, title, datetime, description, place);
       },
     });
     setShowModal(true);
   }
 
-  const onClickMint = async (image, category, title, datetime, description, place) => {
+  const onClickMint = async (image, name, category, title, datetime, description, place) => {
     if (myAddress === DEFAULT_ADDRESS) {
       alert("NO ADDRESS");
       return;
     }
 
-    const metadataURL = await KasAPI.uploadMetaData(image, category, title, datetime, description, place);
+    const metadataURL = await KasAPI.uploadMetaData(image, name, category, title, datetime, description, place);
     if (!metadataURL) {
       alert("metadata upload fail")
       return;
@@ -276,25 +277,31 @@ function App() {
               인기있는 쿠킹클래스는?
             </Container>
             <Container>
-              <Form className="d-flex" value={searchText}>
-                  <FormControl
-                        value={searchText}
-                        placeholder="검색어를 입력해 주세요." 
-                        type="text"
-                        style={{ width: 200 }}
-                        onChange={(e) => {
-                          setSearchText(e.target.value);
-                        }}
-                      />
-                   <Button 
-                      size="sm"
-                      onClick={() => {setSearch(searchText)}} 
-                      >
-                      <FontAwesomeIcon 
-                      color="black" 
-                      size="1x" icon={faSearch} />
-                    </Button>
-                </Form>
+              <InputGroup className="mb-3">
+                {/* <Form className="d-flex" value={searchText}> */}
+                    <FormControl
+                          value={searchText}
+                          placeholder="검색어를 입력해 주세요." 
+                          type="text"
+                          style={{ width: 200 }}
+                          onChange={(e) => {
+                            setSearchText(e.target.value);
+                          }}
+                        />
+                    <Button 
+                        variant="outline-secondary"
+                        // size="sm"
+                        onClick={() => {setSearch(searchText)}} 
+                        style={{width: 100}}
+                        >
+                        <FontAwesomeIcon 
+                        color="black" 
+                        size="1x" icon={faSearch}
+                        style={{width: 50}}
+                        />
+                      </Button>
+                  {/* </Form> */}
+                </InputGroup>
             </Container>
             <Navbar>
               <Container>
@@ -305,23 +312,25 @@ function App() {
                   <div>
                     <Button 
                       size="sm"
+                      style={{width:"30%"}}
                       onClick={() => {
                       showCategoryModal("카테고리");
                       setIsCategory(true);
                     }} variant="category" >
                       {categoryText}
                       {'  '}
-                      <FontAwesomeIcon color="black" size="lg" icon={faAngleDown} />
+                      <FontAwesomeIcon color="black" size="lg" style={{width:"20%"}} icon={faAngleDown} />
                     </Button>
                     {'  '}
                     <Button size="sm"
+                      style={{width:"30%"}}
                       onClick={() => {
                       showCategoryModal("정렬");
                       setIsCategory(false);
                     }} variant="category" >
                       {filterText}
                       {'  '}
-                      <FontAwesomeIcon color="black" size="lg" icon={faAngleDown} />
+                      <FontAwesomeIcon color="black" size="lg" style={{width:"20%"}} icon={faAngleDown} />
                     </Button>
                   </div>
                 </Navbar.Collapse>
@@ -338,7 +347,7 @@ function App() {
               
               <>
                <Row key={`rowkey${rowIndex}`}>
-                <Col style={{ marginRight: 0, paddingRight: 0 }}>
+                <Col style={{ marginRight: 0, paddingRight: 0, width: "50%" }}>
                   {
                   <Card
                     onClick={() => {
@@ -357,7 +366,7 @@ function App() {
                   }
                 </Col>
                   
-                <Col style={{ marginRight: 0, paddingRight: 0 }}>
+                <Col style={{ marginRight: 0, paddingRight: 0, width: "50%" }}>
                   {nfts.length > rowIndex * 2 + 1 ? (
                     <Card
                       onClick={() => {
@@ -469,8 +478,31 @@ function App() {
         {tab === "MINT" ? (
           <div className="container" style={{ padding: 0, width: "100%" }}>
             <b>발행할 정보를 입력해주세요</b><br/>
+            {mintImageUrl !== "" ? (
+              <Card.Img src={mintImageUrl} height={"50%"} />
+            ) : null}
             <Form>
               <Form.Group>
+                <span>업체명</span><span>*</span>
+                <Form.Control
+                  value={mintName}
+                  type="text"
+                  placeholder="업체명을 입력해 주세요"
+                  onChange={(e) => {
+                    setMintName(e.target.value);
+                  }}
+                />
+                <br/>
+                <span>티켓이미지 주소</span><span>*</span>
+                <Form.Control
+                  value={mintImageUrl}
+                  type="text"
+                  placeholder="발행할 티켓이미지 주소를 입력해 주세요"
+                  onChange={(e) => {
+                    setMintImageUrl(e.target.value);
+                  }}
+                />
+                <br/>
                 <span>카테고리</span><span>*</span>
                 <ButtonGroup className="mb-2">
                   {categories.map((category, idx) => (
@@ -533,7 +565,7 @@ function App() {
               <br />
                   <Button
                     onClick={() => {
-                      onClickMintButton("https://upload.wikimedia.org/wikipedia/commons/7/74/%EB%A9%8B%EC%9F%81%EC%9D%B4%EC%82%AC%EC%9E%90%EC%B2%98%EB%9F%BC_%EB%A1%9C%EA%B3%A0.png", mintCategory, mintTitle, mintDatetime, mintDescription, mintPlace);
+                      onClickMintButton(mintImageUrl, mintName, mintCategory, mintTitle, mintDatetime, mintDescription, mintPlace);
                     }}
                     variant="primary"
                     style={{
@@ -625,65 +657,71 @@ function App() {
           <Nav defaultActiveKey="/home" className="flex-column">
             {(isCategory === true) ?
              <> <Button 
+             variant="outline-secondary"
              onClick={() => {
                setShowCategory(false);
                setClickedCategory(0);
                setCategoryText("전체");
              }}>
                전체 {'  '}
-               {(clickedCategory===0) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+               {(clickedCategory===0) ? <FontAwesomeIcon color="#34CD75" size="lg" icon={faCheck} style={{width:"20"}} /> : null}
            </Button>
            <br />
            <Button 
+              variant="outline-secondary"
               onClick={() => {
                 setShowCategory(false);
                 setClickedCategory(1);
                 setCategoryText("식사권");
               }}>
                 식사권 {'  '}
-                {(clickedCategory===1) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+                {(clickedCategory===1) ? <FontAwesomeIcon color="#34CD75" size="lg" icon={faCheck} style={{width:"20"}}  /> : null}
             </Button>
             <br />
             <Button
+              variant="outline-secondary"
               onClick={() => {
                  setShowCategory(false);
                  setClickedCategory(2);
                  setCategoryText("쿠킹 클래스");
                 }}>
                 쿠킹 클래스 {'  '}
-                {(clickedCategory===2) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+                {(clickedCategory===2) ? <FontAwesomeIcon color="#34CD75" size="lg" icon={faCheck} style={{width:"20"}}  /> : null}
 
             </Button>
             <br />
             <Button
+              variant="outline-secondary"
               onClick={() => {
                 setShowCategory(false);
                 setClickedCategory(3);
                 setCategoryText("리미티드 예약");
                 }}>
                 리미티드 예약 {'  '}
-                {(clickedCategory===3) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+                {(clickedCategory===3) ? <FontAwesomeIcon color="#34CD75" size="lg" icon={faCheck} style={{width:"20"}}  /> : null}
             </Button>
             </> : //null 
             <>
             <Button 
+              variant="outline-secondary"
               onClick={() => {
                 setShowCategory(false);
                 setClickedFilter(1);
                 setFilterText("등록순");
               }}>
                 등록순 {'  '}
-                {(clickedFilter===1) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+                {(clickedFilter===1) ? <FontAwesomeIcon color="#34CD75" size="lg" icon={faCheck} style={{width:"20"}} /> : null}
             </Button>
             <br />
             <Button
+              variant="outline-secondary"
               onClick={() => {
                  setShowCategory(false);
                  setClickedFilter(2);
                  setFilterText("마감순");
                 }}>
                 마감순 {'  '}
-                {(clickedFilter===2) ? <FontAwesomeIcon color="white" size="lg" icon={faCheck} /> : null}
+                {(clickedFilter===2) ? <FontAwesomeIcon color="#34CD75" size="lg" icon={faCheck} style={{width:"20"}} /> : null}
 
             </Button>
             </>
@@ -695,7 +733,7 @@ function App() {
       {/* 탭 */}
       {myAddress !== DEFAULT_ADDRESS ? (
       <nav
-        style={{ backgroundColor: "white", height: 45, width: 360 }}
+        style={{ backgroundColor: "white", height: 45, width: 390 }}
         className="navbar fixed-bottom navbar-light"
         role="navigation"
       >
@@ -710,7 +748,7 @@ function App() {
               className="row d-flex flex-column justify-content-center align-items-center"
             >
               <div>
-                <FontAwesomeIcon color="#1b1717" size="lg" icon={faHome} style={{ width: 120 }}/>
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faHome} style={{ width: 130 }}/>
               </div>
             </div>
             <div
@@ -721,7 +759,7 @@ function App() {
               className="row d-flex flex-column justify-content-center align-items-center"
             >
               <div>
-                <FontAwesomeIcon color="#1b1717" size="lg" icon={faPlus} style={{ width: 120 }} />
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faPlus} style={{ width: 130 }} />
               </div>
             </div>
             <div
@@ -733,7 +771,7 @@ function App() {
               className="row d-flex flex-column justify-content-center align-items-center"
             >
               <div>
-                <FontAwesomeIcon color="#1b1717" size="lg" icon={faWallet} style={{ width: 120 }} />
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faWallet} style={{ width: 130 }} />
               </div>
             </div>
           </div>

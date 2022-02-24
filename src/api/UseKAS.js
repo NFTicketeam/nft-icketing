@@ -15,13 +15,14 @@ const option = {
 
 }
 
-export const uploadMetaData = async (image,category, title, datetime, description, place) => {
+export const uploadMetaData = async (image, name, category, title, datetime, description, place) => {
     const _description = "asdf";
     const _name = "KlayNFT"
 
     const metadata = {
         metadata: {
             name: _name,
+            shop_name: name,
             _description: _description,
             image:image,
             category:category,
