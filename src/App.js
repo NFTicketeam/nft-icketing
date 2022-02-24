@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import logo from "./logo.svg";
 import QRCode from "qrcode.react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faWallet, faPlus, faArrowLeft, faAngleDown, faCheck,faSearch } from "@fortawesome/free-solid-svg-icons";
-import { getBalance, fetchCardsOf } from "./api/UseCaver";
+import { getBalance, fetchCardsOf, getPriceOf, sellCardOf } from "./api/UseCaver";
 import * as KlipAPI from "./api/UseKlip";
 import * as KasAPI from "./api/UseKAS";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -11,7 +10,6 @@ import "./App.css";
 import "./market.css";
 import {
   Navbar,
-  FormControl,
   Dropdown,
   Alert,
   Container,
@@ -24,7 +22,9 @@ import {
   Col,
   ButtonGroup,
   ToggleButton,
-  Image
+  Image,
+  InputGroup,
+  FormControl,
 } from "react-bootstrap";
 import { MARKET_CONTRACT_ADDRESS } from "./constants";
 
@@ -34,49 +34,79 @@ function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
   const [myAddress, setMyAddress] = useState("0x257C15cA1DcDE9bc5512031331Ee1a51115d2491");
-  const [nft, setNft] = useState({ id: '1', uri: '' });
+  //const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
+  const [nft, setNft] = useState({id: '1', uri: ''});
 
   // UI
   const [qrvalue, setQrvalue] = useState(DEFAULT_QR_CODE);
   const [tab, setTab] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL
-  const [tabBefore, setTabBefore] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL
+  const [tabBefore, setTabBefore] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL, SELL
   // const [mintImageUrl, setMintImageUrl] = useState("");
   const [mintCategory, setMintCategory] = useState("dining");
   const [mintTitle, setMintTitle] = useState("");
   const [mintDatetime, setMintDatetime] = useState("");
   const [mintDescription, setMintDescription] = useState("");
   const [mintPlace, setMintPlace] = useState("");
+  const [sellPrice, setSellPrice] = useState("");
 
   const [searchText, setSearchText] = useState("");
   const [categoryText, setCategoryText] = useState("카테고리");
   const [filterText, setFilterText] = useState("등록순");
 
+
   const categories = [
-    { name: '식사권', value: '1' },
-    { name: '쿠킹 클래스', value: '2' },
-    { name: '리미티드 예약', value: '3' },
+    { name: '식사권', value: 'dining' },
+    { name: '쿠킹 클래스', value: 'class' },
+    { name: '리미티드 예약', value: 'limited' }
   ];
 
-
-  // Modal
   const [clickedCategory, setClickedCategory] = useState(0);
   const [clickedFilter, setClickedFilter] = useState(1);
   const [isCategory, setIsCategory] = useState(false);
 
-  const [showModal, setShowModal] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
   const [categoryModalProps, setCategoryModalProps] = useState({
     title: "MODAL",
     onConfirm: () => { },
   });
+  
+  // Modal
+  const [showModal, setShowModal] = useState(false);
   const [modalProps, setModalProps] = useState({
     title: "MODAL",
-    onConfirm: () => { },
+    onConfirm: () => {},
   });
   const rows = nfts.slice(nfts.length / 2);
   const fetchMarketNFTs = async () => {
     const _nfts = await fetchCardsOf(MARKET_CONTRACT_ADDRESS);
+    for (var nft of _nfts) {
+      const _price = await getPriceOf(nft.id);
+      nft.price = _price / 1000000000000000000;
+    }
+    
     setNfts(_nfts);
+  };
+
+  const setSearch = async (searchText) => {
+    const _nfts = await fetchCardsOf(MARKET_CONTRACT_ADDRESS);
+    let _nft= _nfts;
+    for (var nft of _nft) {
+      const _price = await getPriceOf(nft.id);
+      nft.price = _price / 1000000000000000000;
+    }
+    if(!categoryText.includes("전체") && !categoryText.includes("카테고리")){
+      _nft = _nft.map(o =>
+       (o.uri.category.includes(categories.find(o => o.name === categoryText).value) ? o : null )).filter(o => (o !== null));
+    }
+    
+     if(searchText == '') {
+      setNfts(_nft);
+     }else{
+      _nft = _nft.map((o,idx)=>(o.uri.title.includes(searchText) ? o : null)).filter(o => (o !== null));
+      setNfts(_nft);
+     }
+
+
   };
 
   const fetchMyNFTs = async () => {
@@ -123,7 +153,11 @@ function App() {
   };
 
   const onClickTransfer = (id) => {
-    if (tabBefore === "WALLET") {
+    if (tab === "SELL") {
+      if (sellPrice == "" || sellPrice <= 0) {
+        alert("금액을 정확히 입력해주세요.")
+        return
+      }
       setModalProps({
         title: "판매하시겠습니까?",
         onConfirm: () => {
@@ -131,6 +165,10 @@ function App() {
         },
       });
       setShowModal(true);
+    }
+    if (tabBefore === "WALLET") {
+      setTab("SELL")
+      setTabBefore("DETAIL")
     }
     if (tabBefore === "MARKET") {
       setModalProps({
@@ -143,7 +181,9 @@ function App() {
     }
   };
 
-  const onClickMyCard = (tokenId) => {
+  const onClickMyCard = async (tokenId) => {    
+    await sellCardOf(tokenId, sellPrice);
+
     KlipAPI.listingCard(myAddress, tokenId, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
       alert("판매 완료되었습니다.")
@@ -151,8 +191,10 @@ function App() {
     });
   };
 
-  const onClickMarketCard = (tokenId) => {
-    KlipAPI.buyCard(tokenId, setQrvalue, (result) => {
+  const onClickMarketCard = async (tokenId) => {
+    const price = await getPriceOf(tokenId)
+
+    KlipAPI.buyCard(tokenId, price, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
       alert("구매 완료되었습니다.")
       setTab(tabBefore)
@@ -167,6 +209,7 @@ function App() {
     });
     setShowCategory(true);
   };
+
 
   const getUserData = () => {
     setModalProps({
@@ -191,74 +234,67 @@ function App() {
       <div style={{ padding: 10 }}>
 
         {tab === "WALLET" ? (
-          // {/* 주소 잔고 */}
-          <div>
-            <div
-              style={{
-                fontSize: 30,
-                fontWeight: "bold",
-                paddingLeft: 5,
-                marginTop: 10,
-              }}
-            >
-              내 지갑
-            </div>
-            <div>{myAddress}</div>
-            {myAddress !== DEFAULT_ADDRESS
-              ? `${myBalance} KLAY`
-              : "지갑 연동 안됨"}
+        // {/* 주소 잔고 */}
+        <div>
+          <div
+            style={{
+              fontSize: 30,
+              fontWeight: "bold",
+              paddingLeft: 5,
+              marginTop: 10,
+            }}
+          >
+            내 지갑
           </div>
+          <div>{myAddress}</div>
+          {myAddress !== DEFAULT_ADDRESS
+            ? `${myBalance} KLAY`
+            : "지갑 연동 안됨"}
+        </div>
         ) : null}
 
         {myAddress === DEFAULT_ADDRESS ? (
-          // {/* 로그인 전 화면 (지갑 연동하기) */}
-          <>
-            <br />
-            <br />
-            <br />
-            <br />
-            <Card key={"login"}>
-              <Card.Img variant={"login"} src="https://ifh.cc/g/X5zBI9.png/72px72" />
-              <Card.Title style={{ fontSize: 25 }}>Connect</Card.Title>
-              <Card.Text>즐거운 NFT 모임 플랫폼</Card.Text>
-              <Card.Body>
-                <div className="d-grid gap-2" >
-                  <Button onClick={getUserData} variant={"login"} size="lg">
-                    로그인
-                  </Button>
-                </div>
-                <div />
-              </Card.Body>
-            </Card>
-          </>
+        // {/* 로그인 전 화면 (지갑 연동하기) */}
+        <div style={{textAlign:'center', marginTop:250, paddingRight:10}}>
+          <img src="drawable-mdpi/frame_79.png" style={{width:75, height:74}}/><br/><br/>
+          <img src="drawable-mdpi/dine.png" style={{width:52, height:18}}/><br/><br/>
+          <p>NFT와 함께하는 특별한 다이닝</p><br/><br/>
+          <Button
+            onClick={getUserData}
+            variant={"balance"}
+            style={{ backgroundColor: "#000000", color: '#FFFFFF', fontSize: 25, textAlign: "center", width:340 }}
+          >로그인
+          </Button>
+        </div>
+        ) : null }
 
-        ) : null}
-
-        {/* 로그인 후 마켓 헤더 */}
-        {myAddress !== DEFAULT_ADDRESS && tab === "MARKET" ? (
+       {/* 로그인 후 마켓 헤더 */}
+       {myAddress !== DEFAULT_ADDRESS && tab === "MARKET" ? (
           <>
-            <Container>
-              <Form className="d-flex" value={searchText}>
-                <FormControl
-                  type="search"
-                  className="me-2"
-                  aria-label="Search"
-                  
-                  onChange={()=>{
-                    setSearchText({searchText});
-                  }}
-                />
-                <Button variant="success" onClick={()=>{
-                  setSearchText({searchText});
-                  debugger;
-                }}>
-                  <FontAwesomeIcon color="white" size="lg" icon={faSearch} />
-                </Button>
-              </Form>
-            </Container>
             <Container>
               이번주<br />
               인기있는 쿠킹클래스는?
+            </Container>
+            <Container>
+              <Form className="d-flex" value={searchText}>
+                  <FormControl
+                        value={searchText}
+                        placeholder="검색어를 입력해 주세요." 
+                        type="text"
+                        style={{ width: 200 }}
+                        onChange={(e) => {
+                          setSearchText(e.target.value);
+                        }}
+                      />
+                   <Button 
+                      size="sm"
+                      onClick={() => {setSearch(searchText)}} 
+                      >
+                      <FontAwesomeIcon 
+                      color="black" 
+                      size="1x" icon={faSearch} />
+                    </Button>
+                </Form>
             </Container>
             <Navbar>
               <Container>
@@ -267,7 +303,9 @@ function App() {
                 </Navbar.Text>
                 <Navbar.Collapse className="justify-content-end">
                   <div>
-                    <Button onClick={() => {
+                    <Button 
+                      size="sm"
+                      onClick={() => {
                       showCategoryModal("카테고리");
                       setIsCategory(true);
                     }} variant="category" >
@@ -276,7 +314,8 @@ function App() {
                       <FontAwesomeIcon color="black" size="lg" icon={faAngleDown} />
                     </Button>
                     {'  '}
-                    <Button onClick={() => {
+                    <Button size="sm"
+                      onClick={() => {
                       showCategoryModal("정렬");
                       setIsCategory(false);
                     }} variant="category" >
@@ -296,8 +335,11 @@ function App() {
         {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET" || tab === "WALLET") ? (
           <div className="container" style={{ padding: 0, width: "100%" }}>
             {rows.map((o, rowIndex) => (
-              <Row key={`rowkey${rowIndex}`}>
+              
+              <>
+               <Row key={`rowkey${rowIndex}`}>
                 <Col style={{ marginRight: 0, paddingRight: 0 }}>
+                  {
                   <Card
                     onClick={() => {
                       tab === "MARKET" ? setTabBefore("MARKET") : setTabBefore("WALLET")
@@ -309,11 +351,12 @@ function App() {
                       
                     <Card.Text>[{nfts[rowIndex * 2 ].uri.datetime}]</Card.Text>
                       <Card.Text>[{nfts[rowIndex * 2].uri.title}]</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2].id}]plice</Card.Text>
+                      <Card.Text>[{nfts[rowIndex * 2].price}]KLAY</Card.Text>
                       <Card.Text>[{nfts[rowIndex * 2].uri.place}]</Card.Text>
                   </Card>
-                  
+                  }
                 </Col>
+                  
                 <Col style={{ marginRight: 0, paddingRight: 0 }}>
                   {nfts.length > rowIndex * 2 + 1 ? (
                     <Card
@@ -327,15 +370,20 @@ function App() {
                       
                       <Card.Text>[{nfts[rowIndex * 2 + 1].uri.datetime}]</Card.Text>
                       <Card.Text>[{nfts[rowIndex * 2 + 1].uri.title}]</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2 + 1].id}]plice</Card.Text>
+                      <Card.Text>[{nfts[rowIndex * 2 + 1].price}]KLAY</Card.Text>
                       <Card.Text>[{nfts[rowIndex * 2 + 1].uri.place}]</Card.Text>
                     </Card>
                   ) : null}
                 </Col>
               </Row>
-            ))}
+              </>
+              
+            )
+            
+            )} 
           </div>
         ) : null}
+
         {/* 상세 페이지 */}
         {myAddress !== DEFAULT_ADDRESS && tab === "DETAIL" ? (
           <div className="container" style={{ padding: 0, width: "100%" }}>
@@ -346,11 +394,11 @@ function App() {
             </div>
             <div><Image src={nft.uri.image} /></div>
             <div>
-              {nft.uri.title} <br />
-              {nft.uri.category} <br />
-              {nft.uri.datetime} <br />
-              {nft.uri.description} <br />
-              {nft.uri.place} <br />
+              {nft.uri.title} <br/>
+              {nft.uri.category} <br/>
+              {nft.uri.datetime} <br/>
+              {nft.uri.description} <br/>
+              {nft.uri.place} <br/>
               {nft.id}
             </div>
             <Button
@@ -368,10 +416,59 @@ function App() {
           </div>
         ) : null}
 
+        {/* 판매 페이지 */}
+        {myAddress !== DEFAULT_ADDRESS && tab === "SELL" ? (
+          <div className="container" style={{ padding: 0, width: "100%" }}>
+            <div onClick={() => {
+              setTab(tabBefore)
+              setTabBefore("WALLET")
+            }}>
+              <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} />
+            </div>
+            <div>
+              <b>판매할 가격을 입력해주세요</b><br/>
+              <Form>
+                <span>판매 금액</span>
+                <InputGroup className="mb-3">
+                  <FormControl
+                    value={sellPrice}
+                    placeholder="0"
+                    type="number"
+                    onChange={(e) => {
+                      setSellPrice(e.target.value);
+                    }}
+                  />
+                  <InputGroup.Text id="basic-addon2">KLAY</InputGroup.Text>
+                </InputGroup>
+              </Form>
+            </div>
+            <p>
+              <span>가격 기준</span><br/>
+              <span>1 KLAY = 1500 원</span><br/>
+              <br/>
+              <span>티켓 정보</span><br/>
+              <span>{nft.uri.title}</span><br/>
+              <span>{nft.uri.description}</span><br/>
+            </p>
+            <Button
+              onClick={() => {
+                onClickTransfer(nft.id);
+              }}
+              variant="primary"
+              style={{
+                backgroundColor: "#000000",
+                borderColor: "#000000",
+              }}
+            >
+              판매하기
+            </Button>
+          </div>
+        ) : null}
+        
         {/* 발행 페이지 */}
         {tab === "MINT" ? (
           <div className="container" style={{ padding: 0, width: "100%" }}>
-            <b>발행할 정보를 입력해주세요</b><br />
+            <b>발행할 정보를 입력해주세요</b><br/>
             <Form>
               <Form.Group>
                 <span>카테고리</span><span>*</span>
@@ -391,7 +488,7 @@ function App() {
                     </ToggleButton>
                   ))}
                 </ButtonGroup>
-                <br />
+                <br/>
                 <span>제목</span><span>*</span>
                 <Form.Control
                   value={mintTitle}
@@ -401,7 +498,7 @@ function App() {
                     setMintTitle(e.target.value);
                   }}
                 />
-                <br />
+                <br/>
                 <span>사용날짜</span><span>*</span>
                 <Form.Control
                   value={mintDatetime}
@@ -411,18 +508,18 @@ function App() {
                     setMintDatetime(e.target.value);
                   }}
                 />
-                <br />
+                <br/>
                 <span>티켓 소개</span><span>*</span>
                 <Form.Control
                   value={mintDescription}
                   as="textarea"
                   placeholder="자세한 설명을 입력해 주세요"
-                  stype={{ height: '100px' }}
+                  stype={{height:'100px'}}
                   onChange={(e) => {
                     setMintDescription(e.target.value);
                   }}
                 />
-                <br />
+                <br/>
                 <span>모임 장소</span><span>*</span>
                 <Form.Control
                   value={mintPlace}
@@ -434,18 +531,18 @@ function App() {
                 />
               </Form.Group>
               <br />
-              <Button
-                onClick={() => {
-                  onClickMintButton("https://upload.wikimedia.org/wikipedia/commons/7/74/%EB%A9%8B%EC%9F%81%EC%9D%B4%EC%82%AC%EC%9E%90%EC%B2%98%EB%9F%BC_%EB%A1%9C%EA%B3%A0.png", mintCategory, mintTitle, mintDatetime, mintDescription, mintPlace);
-                }}
-                variant="primary"
-                style={{
-                  backgroundColor: "#000000",
-                  borderColor: "#000000",
-                }}
-              >
-                발행하기
-              </Button>
+                  <Button
+                    onClick={() => {
+                      onClickMintButton("https://upload.wikimedia.org/wikipedia/commons/7/74/%EB%A9%8B%EC%9F%81%EC%9D%B4%EC%82%AC%EC%9E%90%EC%B2%98%EB%9F%BC_%EB%A1%9C%EA%B3%A0.png", mintCategory, mintTitle, mintDatetime, mintDescription, mintPlace);
+                    }}
+                    variant="primary"
+                    style={{
+                      backgroundColor: "#000000",
+                      borderColor: "#000000",
+                    }}
+                  >
+                    발행하기
+                  </Button>
             </Form>
           </div>
         ) : null}
@@ -593,57 +690,56 @@ function App() {
             }
           </Nav>
         </Modal.Footer>
-      </Modal>
+      </Modal>  
 
-      
       {/* 탭 */}
       {myAddress !== DEFAULT_ADDRESS ? (
-        <nav
-          style={{ backgroundColor: "#1b1717", height: 45 }}
-          className="navbar fixed-bottom navbar-light"
-          role="navigation"
-        >
-          <Nav className="w-100">
-            <div className="d-flex flex-row justify-content-around w-100">
-              <div
-                onClick={() => {
-                  setTab("MARKET");
-                  fetchMarketNFTs();
-                  setQrvalue("DEFAULT")
-                }}
-                className="row d-flex flex-column justify-content-center align-items-center"
-              >
-                <div>
-                  <FontAwesomeIcon color="white" size="lg" icon={faHome} />
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setTab("MINT");
-                  setQrvalue("DEFAULT")
-                }}
-                className="row d-flex flex-column justify-content-center align-items-center"
-              >
-                <div>
-                  <FontAwesomeIcon color="white" size="lg" icon={faPlus} />
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setTab("WALLET");
-                  fetchMyNFTs();
-                  setQrvalue("DEFAULT")
-                }}
-                className="row d-flex flex-column justify-content-center align-items-center"
-              >
-                <div>
-                  <FontAwesomeIcon color="white" size="lg" icon={faWallet} />
-                </div>
+      <nav
+        style={{ backgroundColor: "white", height: 45, width: 360 }}
+        className="navbar fixed-bottom navbar-light"
+        role="navigation"
+      >
+        <Nav className="w-100">
+          <div className="d-flex flex-row justify-content-around w-100">
+            <div
+              onClick={() => {
+                setTab("MARKET");
+                fetchMarketNFTs();
+                setQrvalue("DEFAULT")
+              }}
+              className="row d-flex flex-column justify-content-center align-items-center"
+            >
+              <div>
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faHome} style={{ width: 120 }}/>
               </div>
             </div>
-          </Nav>
-        </nav>
-      ) : null}
+            <div
+              onClick={() => {
+                setTab("MINT");
+                setQrvalue("DEFAULT")
+              }}
+              className="row d-flex flex-column justify-content-center align-items-center"
+            >
+              <div>
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faPlus} style={{ width: 120 }} />
+              </div>
+            </div>
+            <div
+              onClick={() => {
+                setTab("WALLET");
+                fetchMyNFTs();
+                setQrvalue("DEFAULT")
+              }}
+              className="row d-flex flex-column justify-content-center align-items-center"
+            >
+              <div>
+                <FontAwesomeIcon color="#1b1717" size="lg" icon={faWallet} style={{ width: 120 }} />
+              </div>
+            </div>
+          </div>
+        </Nav>
+      </nav>
+      ) : null }
     </div>
   );
 }

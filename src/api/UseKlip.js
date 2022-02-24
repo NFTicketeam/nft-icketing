@@ -14,13 +14,14 @@ const getKlipAccessUrl = (method, request_key) => {
   }
   return `kakaotalk://klipwallet/open?url=https://klipwallet.com/?target=/a2a?request_key=${request_key}`;
 };
-export const buyCard = async (tokenId, setQrvalue, callback) => {
+
+export const buyCard = async (tokenId, price, setQrvalue, callback) => {
   const functionJson =
-    '{ "constant": false, "inputs": [ { "name": "tokenId", "type": "uint256" }, { "name": "NFTAddress", "type": "address" } ], "name": "buyNFT", "outputs": [ { "name": "", "type": "bool" } ], "payable": true, "stateMutability": "payable", "type": "function" }';
+    '{ "constant": false, "inputs": [ { "name": "tokenId", "type": "uint256" }, { "name": "NFT", "type": "address" } ], "name": "buyNFT", "outputs": [ { "name": "", "type": "bool" } ], "payable": true, "stateMutability": "payable", "type": "function" }';
   executeContract(
     MARKET_CONTRACT_ADDRESS,
     functionJson,
-    "10000000000000000",
+    (Number(price) + 10000000000000000).toString(),
     `[\"${tokenId}\",\"${NFT_CONTRACT_ADDRESS}\"]`,
     setQrvalue,
     callback
