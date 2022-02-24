@@ -187,7 +187,7 @@ function App() {
         ) : null}
 
         {myAddress === DEFAULT_ADDRESS ? (
-        // {/* 로그인 전 화면 (지갑 연동하기) */}
+          // {/* 로그인 전 화면 (지갑 연동하기) */}
           <>
           <br/>
           <br/>
