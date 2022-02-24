@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import QRCode from "qrcode.react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faWallet, faPlus, faArrowLeft, faAngleDown, faCheck,faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faWallet, faPlus, faArrowLeft, faAngleDown, faCheck,faSearch, faAngleRight, faAngleLeft } from "@fortawesome/free-solid-svg-icons";
 import { getBalance, fetchCardsOf, getPriceOf, sellCardOf } from "./api/UseCaver";
 import * as KlipAPI from "./api/UseKlip";
 import * as KasAPI from "./api/UseKAS";
@@ -52,6 +52,8 @@ function App() {
   const [searchText, setSearchText] = useState("");
   const [categoryText, setCategoryText] = useState("카테고리");
   const [filterText, setFilterText] = useState("등록순");
+
+  const [walletDp, setWalletDp] = useState("WALLET");
 
 
   const categories = [
@@ -225,6 +227,11 @@ function App() {
     setShowModal(true);
   };
 
+
+  const changeWalletDp = (dp) => {
+    setWalletDp(dp);
+  }
+
   useEffect(() => {
     // getUserData();
     fetchMarketNFTs();
@@ -235,22 +242,63 @@ function App() {
 
         {tab === "WALLET" ? (
         // {/* 주소 잔고 */}
-        <div>
-          <div
-            style={{
-              fontSize: 30,
-              fontWeight: "bold",
-              paddingLeft: 5,
-              marginTop: 10,
-            }}
-          >
-            내 지갑
+        <Fragment>
+          <div style={{display:"flex", marginTop:"10%", minHeight:"100px"}}>
+            <div style={{ width: "25%"}}><Card.img src={nfts[0].uri.image} /></div>
+            <div style={{ width: "65%"}}><div style={{fontSize:"20sp", color:"#2d2d2d"}}>홍길동</div><div style={{fontSize:"3px", color:"#5e5e5e"}}>{myAddress}</div>
+            </div>
           </div>
-          <div>{myAddress}</div>
-          {myAddress !== DEFAULT_ADDRESS
-            ? `${myBalance} KLAY`
-            : "지갑 연동 안됨"}
-        </div>
+          <div
+              style={{
+                backgroundColor: "#f5f5f5",
+                minHeight: "130px",
+                marginTop: "10%",
+                padding: "8% 1%"
+              }}
+          >
+            <div>
+              <font style={{
+                  fontSize: 20,
+                  fontWeight: "bold", 
+              }}
+              >
+                내 자산
+              </font>
+            </div>
+            <div style={{
+              padding: "1%",
+              display: "inline-block",
+              whiteSpace: "nowrap",
+              overflow : "hidden",
+              textOverflow : "ellipsis"
+            }}>
+            {myAddress !== DEFAULT_ADDRESS
+              ? `${myBalance} KLAY `
+              : "지갑 연동 안됨"
+            }
+            </div>
+          </div>
+          <div style={{
+            marginTop: "5%",
+            width : "100%",
+            display : "flex"
+          }}
+            onClick= {() => changeWalletDp('OWN')}
+          >
+             <span style={{ padding: "3%", width : "40%" }}>소유한 티켓</span>
+             <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="md" icon={faAngleRight} /></span>
+          </div>
+          <div style={{
+            marginTop: "5%",
+            width : "100%",
+            display : "flex"
+          }}
+          onClick= {() => changeWalletDp('SELL')}
+          >
+             <span style={{ padding: "3%", width : "40%" }}>판매 중인 티켓</span>
+             <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="md" icon={faAngleRight} /></span>
+          </div>
+        </Fragment>
         ) : null}
 
         {myAddress === DEFAULT_ADDRESS ? (
@@ -332,7 +380,23 @@ function App() {
         ) : null}
 
         {/* 갤러리(마켓, 내 지갑) */}
-        {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET" || tab === "WALLET") ? (
+        {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET"|| (tab === "WALLET") && (walletDp === 'OWN' || walletDp === 'SELL')) ? (
+          
+          <Fragment>
+          {tab === "WALLET" || walletDp === 'OWN' || walletDp === 'SELL' ? 
+            <Fragment>
+              <div style={{ marginTop: "5%", display : "flex" }}   onClick={() => {
+                setTab("WALLET");
+                setWalletDp("WALLET");
+                fetchMyNFTs();
+                setQrvalue("DEFAULT")
+              }} >
+                <span style={{ padding: "3%"}}><FontAwesomeIcon color="gray" size="lg" icon={faAngleLeft} /> </span>
+              </div>
+                
+          </Fragment>
+          : ''}
+
           <div className="container" style={{ padding: 0, width: "100%" }}>
             {rows.map((o, rowIndex) => (
               
@@ -382,7 +446,9 @@ function App() {
             
             )} 
           </div>
+        </Fragment>
         ) : null}
+        
 
         {/* 상세 페이지 */}
         {myAddress !== DEFAULT_ADDRESS && tab === "DETAIL" ? (
@@ -741,6 +807,7 @@ function App() {
       </nav>
       ) : null }
     </div>
+    
   );
 }
 
