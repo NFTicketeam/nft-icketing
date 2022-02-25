@@ -93,7 +93,12 @@ function App() {
       nft.uri.categoryKor = _.filter(categories, (i) => {return i.value === nft.uri.category})[0].name;
       let dt = nft.uri.datetime;
       dt = _.replace(_.replace(_.replace(dt, '월', '-'), '일', '-'), '년', '-').split("-");
-      nft.uri["datetimeFmt"] = `${dt[0].substring(2)}/${dt[1].trim()}/${dt[2].trim()}`;
+      let target = _.map(dt, (item) => {
+        let i = item.trim();
+        return i = ( Number(i < 10) && !(i.includes('0')) ) ? '0' + i : i;
+      });
+      
+      nft.uri["datetimeFmt"] = `${target[1]}/${target[2]}`;
 
     }
     setNfts(_nfts);
