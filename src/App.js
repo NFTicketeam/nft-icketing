@@ -36,7 +36,7 @@ const DEFAULT_ADDRESS = "0x00000000000000000000000000000";
 function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
-  const [myAddress, setMyAddress] = useState("0xD70D4fCE9cdD0f27902b2e4e2032e31AC02B8c17");
+  const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
 
   const [nft, setNft] = useState({ id: '1', uri: '' });
 
