@@ -36,7 +36,7 @@ const DEFAULT_ADDRESS = "0x00000000000000000000000000000";
 function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
-  const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
+  const [myAddress, setMyAddress] = useState("0xD70D4fCE9cdD0f27902b2e4e2032e31AC02B8c17");
 
   const [nft, setNft] = useState({ id: '1', uri: '' });
 
@@ -136,6 +136,7 @@ function App() {
     _.map(_nfts, (i) => {
       i["categoryKor"] = _.filter(categories, (ctg) => {return ctg.value === i.uri.category})[0].name;
     })
+    setNfts(_nfts);
   };
 
   const onClickMintButton = (image, name, category, title, datetime, description, place) => {
@@ -233,6 +234,7 @@ function App() {
   };
 
   const changeWalletDp = (dp) => {
+    fetchMyNFTs();
     setWalletDp(dp);
   }
 
@@ -418,7 +420,7 @@ function App() {
 
         {/* 갤러리(마켓, 내 지갑) */}
         {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET"|| (tab === "WALLET") && (walletDp === 'OWN' || walletDp === 'SELL')) ? (
-          
+
           <Fragment>
           {tab === "WALLET" && (walletDp === 'OWN' || walletDp === 'SELL') ? 
             <Fragment>
