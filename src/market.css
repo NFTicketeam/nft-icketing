@@ -12,11 +12,18 @@
   overflow: hidden;
   cursor: pointer;
   transition: 0.4s;
-  border-color: black;
+  border-color: white;
   word-spacing: -2%;
 }
 
 .card-img {
+  width: 100%;
+}
+.card-body {
+  width: 100%;
+}
+
+.card-text {
   width: 100%;
 }
 
@@ -50,4 +57,13 @@
   width: 400px;
   background: #000;
   color: gray;
+}
+
+.react-datepicker__input-container::before {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  font-size:  1rem;
+  color: #333;
+  border-color : #333;
 }
