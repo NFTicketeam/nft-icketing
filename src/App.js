@@ -5,6 +5,7 @@ import { faHome, faWallet, faPlus, faArrowLeft, faAngleDown, faCheck,faSearch, f
 import { getBalance, fetchCardsOf, getPriceOf, sellCardOf } from "./api/UseCaver";
 import * as KlipAPI from "./api/UseKlip";
 import * as KasAPI from "./api/UseKAS";
+import _ from 'lodash';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "./market.css";
@@ -85,8 +86,9 @@ function App() {
     for (var nft of _nfts) {
       const _price = await getPriceOf(nft.id);
       nft.price = _price / 1000000000000000000;
+      nft.uri.categoryKor = _.filter(categories, (i) => {return i.value === nft.uri.category})[0].name;
     }
-    
+
     setNfts(_nfts);
   };
 
@@ -286,7 +288,7 @@ function App() {
             onClick= {() => changeWalletDp('OWN')}
           >
              <span style={{ padding: "3%", width : "40%" }}>소유한 티켓</span>
-             <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="md" icon={faAngleRight} /></span>
+             <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="1x" icon={faAngleRight} /></span>
           </div>
           <div style={{
             marginTop: "5%",
@@ -296,7 +298,7 @@ function App() {
           onClick= {() => changeWalletDp('SELL')}
           >
              <span style={{ padding: "3%", width : "40%" }}>판매 중인 티켓</span>
-             <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="md" icon={faAngleRight} /></span>
+             <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="1x" icon={faAngleRight} /></span>
           </div>
         </Fragment>
         ) : null}
@@ -418,7 +420,7 @@ function App() {
                       setNft(nfts[rowIndex * 2])
                     }}
                   >
-                    <Card.Img src={nfts[rowIndex * 2].uri.image} />
+                    <Card.Img src={nfts[rowIndex * 2].uri.image} maxHeight="164"/>
                       
                     <Card.Text>[{nfts[rowIndex * 2 ].uri.datetime}]</Card.Text>
                       <Card.Text>[{nfts[rowIndex * 2].uri.title}]</Card.Text>
@@ -469,12 +471,12 @@ function App() {
               <div style={{color:"#2d2d2d", fontSize:"25px", fontWeight:"600", marginBottom:"5%"}}> {nft.uri.title}</div>
               <div style={{display:"flex", justifyContent:"space-between"}}>
                  <div>장소</div> 
-                 <div style={{color:"#34cd75", fontSize:"15px", fontWeight:"600", textAlign:"right"}}>50 KLAY ~</div>
+                 <div style={{color:"#34cd75", fontSize:"15px", fontWeight:"600", textAlign:"right"}}> {nft.price} KLAY ~</div>
               </div>
               <div className="borderLine"></div>
-     
+
               <div><label className="detailLb">상세정보</label><span className="detailCont">{nft.uri.description}</span></div>
-              <div><label className="detailLb">카테고리</label><span className="detailCont"><span className="detailCont">{ nft.uri.category } </span></span></div>
+              <div><label className="detailLb">카테고리</label><span className="detailCont"><span className="detailCont">{ nft.uri.categoryKor || '없음'} </span></span></div>
               <div><label className="detailLb">위치</label><span className="detailCont">{nft.uri.place}</span></div>
               <div className="borderLine"></div>
 
@@ -509,8 +511,8 @@ function App() {
               <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} style={{width:20}} />
             </div>
             <div className="nftSellContent">
-              <div>
-                <span style={{fontWeight: "600", fontSize: "20px",}}>판매할 가격을 입력해주세요</span>
+              <div style={{marginTop:"20%"}}>
+                {/* <span style={{fontWeight: "600", fontSize: "20px",}}>판매할 가격을 입력해주세요</span> */}
               </div>
               <div>
               <Form>
@@ -532,20 +534,20 @@ function App() {
               <div>
                 <label className="detailLb">가격 기준</label>
                 <div style={{display:"flex", justifyContent:"center", border: "1px solid #b5b5b5", textAlign: "cetner", minHeight:"50px", padding: "3%"}}>
-                    <div><span style={{fontSize:"13px", fontWeight:"700"}}>1KLAY</span><span style={{marginLeft:"10%", fontSize: "11px", color:"#252525"}}>(클레이)</span></div>
-                    <div> = </div>
+                    <div style={{textAlign:"center"}}><span style={{fontSize:"13px", fontWeight:"700"}}>1KLAY</span><span style={{marginLeft:"10%", fontSize: "11px", color:"#252525"}}>(클레이)</span></div>
+                    <div style={{textAlign:"center"}}>  = </div>
                     <div><span style={{fontSize:"13px", fontWeight:"700"}}>1,500</span><span style={{marginLeft:"10%", fontSize: "11px", color:"#252525"}}>(원)</span></div>
                 </div>
                 
               </div>
               <div>
-                <label className="detailLb">티켓 정보</label>
+                <label className="detailLb" style={{marginTop:"10%"}}>티켓 정보</label>
                 <div className="borderLine"></div>
                   <span>{nft.uri.title}</span><br/>
                   <span>{nft.uri.description}</span><br/>
               </div>
               <div>
-                <label className="detailLb">판매수수료</label>
+                <label className="detailLb" style={{marginTop:"10%"}}>판매수수료</label>
                 <div className="borderLine"></div>
                   <span>{nft.uri.title}</span><br/>
                   <span>{nft.uri.description}</span><br/>
