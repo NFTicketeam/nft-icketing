@@ -34,8 +34,7 @@ const DEFAULT_ADDRESS = "0x00000000000000000000000000000";
 function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
-  const [myAddress, setMyAddress] = useState("0xD70D4fCE9cdD0f27902b2e4e2032e31AC02B8c17");
-  // const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
+  const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
   const [nft, setNft] = useState({id: '1', uri: ''});
 
   // UI
@@ -127,6 +126,7 @@ function App() {
     setModalProps({
       title: "발행하시겠습니까?",
       onConfirm: () => {
+        setTabBefore("MINT")
         onClickMint(image, name, category, title, datetime, description, place);
       },
     });
@@ -153,6 +153,7 @@ function App() {
       setQrvalue,
       (result) => {
         // alert(JSON.stringify(result));
+        setTab("COMPLETE")
       }
     );
   };
@@ -192,7 +193,7 @@ function App() {
     KlipAPI.listingCard(myAddress, tokenId, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
       // alert("판매 완료되었습니다.")
-      setTab(tabBefore)
+      setTab("COMPLETE")
     });
   };
 
@@ -202,7 +203,7 @@ function App() {
     KlipAPI.buyCard(tokenId, price, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
       // alert("구매 완료되었습니다.")
-      setTab(tabBefore)
+      setTab("COMPLETE")
     });
   };
 
@@ -484,7 +485,7 @@ function App() {
 
                 <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">발행일</label><span className="detailCont">{nft.uri.datetime}</span></div>
                 <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">토큰ID</label><span className="detailCont">{nft.id}</span></div>
-                <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">컨트랙트 주소</label><span className="detailCont">0x12030123y20450</span></div>
+                <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">컨트랙트 주소</label><span className="detailCont">{MARKET_CONTRACT_ADDRESS}</span></div>
             </div>
             <Button
               onClick={() => {
@@ -674,6 +675,37 @@ function App() {
           </div>
         ) : null}
 
+        {/* 완료 페이지 */}
+        {myAddress !== DEFAULT_ADDRESS && tab === "COMPLETE" ? (
+          <div style={{textAlign:'center', marginTop:250, paddingRight:10}}>
+            {tabBefore == "MARKET" ? 
+              <div>
+                <img src="drawable-mdpi/frame_84.png" style={{width:75, height:74}}/><br/><br/>
+                <p style={{fontSize:"20px", fontWeight:"bold"}}>구매 완료!</p><br/><br/>
+                <p>구매한 NFT는 마이페이지에서 <br/> 확인할 수 있어요 :)</p>
+              </div>
+            : tabBefore == "MINT" ?
+            <div>
+              <img src="drawable-mdpi/frame_85.png" style={{width:75, height:74}}/><br/><br/>
+              <p style={{fontSize:"20px", fontWeight:"bold"}}>발행 완료!</p><br/><br/>
+              <p>발행한 NFT는 마이페이지에서 <br/> 확인할 수 있어요 :)</p>
+            </div>
+            :
+            <div>
+              <img src="drawable-mdpi/frame_86.png" style={{width:75, height:74}}/><br/><br/>
+              <p style={{fontSize:"20px", fontWeight:"bold"}}>등록 완료!</p><br/><br/>
+              <p>등록한 NFT는 마켓에서 <br/> 확인할 수 있어요 :)</p>
+            </div>
+            }
+            <Button
+              onClick={() => {setTab(tabBefore)}}
+              variant={"balance"}
+              style={{ backgroundColor: "#000000", color: '#FFFFFF', fontSize: 25, textAlign: "center", width:340 }}
+            >닫기
+            </Button>
+          </div>
+        ) : null}
+
         {qrvalue !== "DEFAULT" ? (
           <Container
             style={{
@@ -691,8 +723,7 @@ function App() {
       </div>
       <br />
       <br />
-      <br />
-      <br />
+  
       <br />
       {/* 모달 */}
       <Modal
