@@ -87,8 +87,11 @@ function App() {
       const _price = await getPriceOf(nft.id);
       nft.price = _price / 1000000000000000000;
       nft.uri.categoryKor = _.filter(categories, (i) => {return i.value === nft.uri.category})[0].name;
-    }
+      let dt = nft.uri.datetime;
+      dt = _.replace(_.replace(_.replace(dt, '월', '-'), '일', '-'), '년', '-').split("-");
+      nft.uri["datetimeFmt"] = `${dt[0].substring(2)}/${dt[1].trim()}/${dt[2].trim()}`;
 
+    }
     setNfts(_nfts);
   };
 
@@ -424,12 +427,13 @@ function App() {
                       setNft(nfts[rowIndex * 2])
                     }}
                   >
-                    <Card.Img src={nfts[rowIndex * 2].uri.image} maxHeight="164"/>
-                      
-                    <Card.Text>[{nfts[rowIndex * 2 ].uri.datetime}]</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2].uri.title}]</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2].price}]KLAY</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2].uri.place}]</Card.Text>
+                    <Card.Img src={nfts[rowIndex * 2].uri.image}/>
+                    <Card.Text style={{ color:"#f5f5f5", backgroundColor:"#252525", padding: "1%", borderRadius:"40px", marginTop: "5%", maxWidth:"100px", textAlign:"center"}}>■ {nfts[rowIndex * 2 ].uri.datetimeFmt}</Card.Text>
+                    <div style={{padding: "5%"}}>
+                      <Card.Text style={{ color: "#000000", fontSize:"12px", textAlign:"left", marginBottom: "0.5rem"}}>{nfts[rowIndex * 2].uri.title}</Card.Text>
+                      <Card.Text style={{ color: "#34cd75", fontSize:"12px", textAlign:"left", fontWeight:"bold" , marginBottom: "0.5rem"}}>{nfts[rowIndex * 2].price | 0 } KLAY ~</Card.Text>
+                      <Card.Text style={{ color: "#6f6f6e", fontSize:"10px", textAlign:"left", marginBottom: "0.5rem"}}>{nfts[rowIndex * 2].uri.shop_name}</Card.Text>
+                    </div>
                   </Card>
                   }
                 </Col>
@@ -444,12 +448,13 @@ function App() {
                       }}
                     >
                       <Card.Img src={nfts[rowIndex * 2 + 1].uri.image} />
-                      
-                      <Card.Text>[{nfts[rowIndex * 2 + 1].uri.datetime}]</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2 + 1].uri.title}]</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2 + 1].price}]KLAY</Card.Text>
-                      <Card.Text>[{nfts[rowIndex * 2 + 1].uri.place}]</Card.Text>
-                    </Card>
+                        <Card.Text style={{ color:"#f5f5f5", backgroundColor:"#252525", padding: "1%", borderRadius:"40px", marginTop: "5%", maxWidth:"100px", textAlign:"center"}}>■ {nfts[rowIndex * 2 ].uri.datetimeFmt}</Card.Text>
+                      <div style={{padding: "5%"}}>
+                        <Card.Text style={{ color: "#000000", fontSize:"13px", textAlign:"left", marginBottom: "0.5rem"}}>{nfts[rowIndex * 2].uri.title}</Card.Text>
+                        <Card.Text style={{ color: "#34cd75", fontSize:"12px", textAlign:"left", fontWeight:"bold", marginBottom: "0.5rem"}}>{nfts[rowIndex * 2].price | 0 } KLAY ~</Card.Text>
+                        <Card.Text style={{ color: "#6f6f6e", fontSize:"10px", textAlign:"left", marginBottom: "0.5rem"}}>{nfts[rowIndex * 2].uri.shop_name}</Card.Text>
+                      </div>
+                      </Card>
                   ) : null}
                 </Col>
               </Row>
