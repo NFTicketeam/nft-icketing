@@ -33,7 +33,8 @@ const DEFAULT_ADDRESS = "0x00000000000000000000000000000";
 function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
-  const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
+  const [myAddress, setMyAddress] = useState("0xD70D4fCE9cdD0f27902b2e4e2032e31AC02B8c17");
+  // const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
   const [nft, setNft] = useState({id: '1', uri: ''});
 
   // UI
@@ -147,7 +148,7 @@ function App() {
       metadataURL,
       setQrvalue,
       (result) => {
-        alert(JSON.stringify(result));
+        // alert(JSON.stringify(result));
       }
     );
   };
@@ -186,7 +187,7 @@ function App() {
 
     KlipAPI.listingCard(myAddress, tokenId, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
-      alert("판매 완료되었습니다.")
+      // alert("판매 완료되었습니다.")
       setTab(tabBefore)
     });
   };
@@ -196,7 +197,7 @@ function App() {
 
     KlipAPI.buyCard(tokenId, price, setQrvalue, (result) => {
       console.log(JSON.stringify(result));
-      alert("구매 완료되었습니다.")
+      // alert("구매 완료되었습니다.")
       setTab(tabBefore)
     });
   };
@@ -448,9 +449,10 @@ function App() {
               <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} style={{width:20}} />
             </div>
             <div>
-              <b>판매할 가격을 입력해주세요</b><br/>
+              <br/>
+              <b style={{fontSize:"20px"}}>판매할 가격을 입력해주세요</b><br/><br/>
               <Form>
-                <span>판매 금액</span>
+                <span style={{fontSize:"18px", fontWeight:"bold"}}>판매 금액</span><br/><br/>
                 <InputGroup className="mb-3">
                   <FormControl
                     value={sellPrice}
@@ -459,18 +461,24 @@ function App() {
                     onChange={(e) => {
                       setSellPrice(e.target.value);
                     }}
+                    style={{ width: 200 }}
                   />
-                  <InputGroup.Text id="basic-addon2">KLAY</InputGroup.Text>
+                  <InputGroup.Text id="basic-addon2" style={{ width: 100 }}>KLAY</InputGroup.Text>
                 </InputGroup>
               </Form>
-            </div>
+            </div><br/>
             <p>
               <span>가격 기준</span><br/>
               <span>1 KLAY = 1500 원</span><br/>
-              <br/>
-              <span>티켓 정보</span><br/>
+              <br/><br/>
+              <span style={{fontSize:"18px", fontWeight:"bold"}}>티켓 정보</span><br/><hr/>
+              <span>{nft.uri.place}</span><br/>
               <span>{nft.uri.title}</span><br/>
               <span>{nft.uri.description}</span><br/>
+              <br/>
+              <span style={{fontSize:"18px", fontWeight:"bold"}}>판매 수수료</span><br/><hr/>
+              <span style={{float:"left", width:100}}>결제 금액</span>
+              <span style={{float:"right", width:100}}>0.01 KLAY</span><br/><br/><br/><br/>
             </p>
             <Button
               onClick={() => {
