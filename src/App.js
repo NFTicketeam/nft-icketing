@@ -91,8 +91,11 @@ function App() {
       const _price = await getPriceOf(nft.id);
       nft.price = _price / 1000000000000000000;
       nft.uri.categoryKor = _.filter(categories, (i) => {return i.value === nft.uri.category})[0].name;
-    }
+      let dt = nft.uri.datetime;
+      dt = _.replace(_.replace(_.replace(dt, '월', '-'), '일', '-'), '년', '-').split("-");
+      nft.uri["datetimeFmt"] = `${dt[0].substring(2)}/${dt[1].trim()}/${dt[2].trim()}`;
 
+    }
     setNfts(_nfts);
   };
 
@@ -254,11 +257,6 @@ function App() {
         {tab === "WALLET" && walletDp === 'WALLET' ? (
         // {/* 주소 잔고 */}
         <Fragment>
-          <div style={{display:"flex", marginTop:"10%", minHeight:"100px"}}>
-            <div style={{ width: "25%"}}> 사진 </div>
-            <div style={{ width: "65%"}}><div style={{fontSize:"20sp", color:"#2d2d2d"}}>홍길동</div><div style={{fontSize:"3px", color:"#5e5e5e"}}>{myAddress}</div>
-            </div>
-          </div>
           <div
               style={{
                 backgroundColor: "#f5f5f5",
@@ -276,8 +274,12 @@ function App() {
                 내 자산
               </font>
             </div>
+            <div style={{padding: "0.5%",fontSize:"11px", color:"gray"}}>
+              ${myAddress}
+            </div>
             <div style={{
-              padding: "1%",
+              padding: "0.5%",
+              color:"#34cd75", fontSize:"20px", fontWeight:"600",
               display: "inline-block",
               whiteSpace: "nowrap",
               overflow : "hidden",
@@ -299,7 +301,7 @@ function App() {
              <span style={{ padding: "3%", width : "40%" }}>소유한 티켓</span>
              <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="1x" icon={faAngleRight} /></span>
           </div>
-          <div style={{
+          {/* <div style={{
             marginTop: "5%",
             width : "100%",
             display : "flex"
@@ -308,7 +310,7 @@ function App() {
           >
              <span style={{ padding: "3%", width : "40%" }}>판매 중인 티켓</span>
              <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="1x" icon={faAngleRight} /></span>
-          </div>
+          </div> */}
         </Fragment>
         ) : null}
 
@@ -413,7 +415,7 @@ function App() {
         {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET"|| (tab === "WALLET") && (walletDp === 'OWN' || walletDp === 'SELL')) ? (
           
           <Fragment>
-          {tab === "WALLET" || walletDp === 'OWN' || walletDp === 'SELL' ? 
+          {tab === "WALLET" && (walletDp === 'OWN' || walletDp === 'SELL') ? 
             <Fragment>
               <div style={{ marginTop: "5%", display : "flex" }}   onClick={() => {
                 setTab("WALLET");
@@ -441,13 +443,15 @@ function App() {
                       }}
                     >
                       <Card.Img src={nfts[rowIndex * 2].uri.image} />
+
                         <div class="jb-image">
                           <img src="drawable-hdpi/frame_6.png" style={{width:45, height:16}}/>
                         </div>
                         <div class="jb-text">
-                            <p>{nfts[rowIndex * 2 ].uri.datetime.split('/')[0] +'/'+ nfts[rowIndex * 2 ].uri.datetime.split('/')[1]}</p>
+                            <p>{nfts[rowIndex * 2 ].uri.datetimeFmt}</p>
                         </div>
                         
+
                       <Card.Text
                         style={{ fontSize: 15, float: "left", fontWeight: "bold" }}
                       >
@@ -468,7 +472,7 @@ function App() {
                         style={{ fontSize: 12, float: "left", color: "gray" }}
                       >
                         {categories.find(o => o.value === nfts[rowIndex * 2].uri.category).name}
-                        {' '} * {nfts[rowIndex * 2].uri.place}
+                        {' '} - {nfts[rowIndex * 2].uri.shop_name}
                       </Card.Text>
 
                     </Card>
@@ -485,12 +489,14 @@ function App() {
                     }}
                   >
                     <Card.Img src={nfts[rowIndex * 2].uri.image} />
+
                     <div class="jb-image">
                           <img src="drawable-hdpi/frame_6.png" style={{width:45, height:16}}/>
                         </div>
                         <div class="jb-text">
-                            <p>{nfts[rowIndex * 2 +1].uri.datetime.split('/')[0] +'/'+ nfts[rowIndex * 2+1 ].uri.datetime.split('/')[1]}</p>
+                            <p>{nfts[rowIndex * 2 + 1 ].uri.datetimeFmt}</p>
                         </div>
+
 
                     <Card.Text
                       style={{ fontSize: 15, float: "left", fontWeight: "bold" }}
@@ -512,7 +518,7 @@ function App() {
                       style={{ fontSize: 12, float: "left", color: "gray" }}
                     >
                       {categories.find(o => o.value === nfts[rowIndex * 2+1].uri.category).name}
-                      {' '} * {nfts[rowIndex * 2+1].uri.place}
+                      {' '} - {nfts[rowIndex * 2+1].uri.shop_name}
                     </Card.Text>
 
                   </Card>
@@ -520,7 +526,6 @@ function App() {
                   </Col>
                 </Row>
               </>
-
             )
 
             )}
