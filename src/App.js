@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import QRCode from "qrcode.react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faWallet, faPlus, faArrowLeft, faAngleDown, faCheck,faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faWallet, faPlus, faArrowLeft, faAngleDown, faCheck,faSearch, faAngleRight, faAngleLeft} from "@fortawesome/free-solid-svg-icons";
 import { getBalance, fetchCardsOf, getPriceOf, sellCardOf } from "./api/UseCaver";
 import * as KlipAPI from "./api/UseKlip";
 import * as KasAPI from "./api/UseKAS";
@@ -53,6 +53,8 @@ function App() {
   const [searchText, setSearchText] = useState("");
   const [categoryText, setCategoryText] = useState("카테고리");
   const [filterText, setFilterText] = useState("등록순");
+
+  const [walletDp, setWalletDp] = useState("WALLET");
 
 
   const categories = [
@@ -211,6 +213,10 @@ function App() {
     setShowCategory(true);
   };
 
+  const changeWalletDp = (dp) => {
+    setWalletDp(dp);
+  }
+
 
   const getUserData = () => {
     setModalProps({
@@ -234,24 +240,65 @@ function App() {
     <div className="App">
       <div style={{ padding: 10 }}>
 
-        {tab === "WALLET" ? (
+        {tab === "WALLET" && walletDp === 'WALLET' ? (
         // {/* 주소 잔고 */}
-        <div>
-          <div
-            style={{
-              fontSize: 30,
-              fontWeight: "bold",
-              paddingLeft: 5,
-              marginTop: 10,
-            }}
-          >
-            내 지갑
+        <Fragment>
+          <div style={{display:"flex", marginTop:"10%", minHeight:"100px"}}>
+            <div style={{ width: "25%"}}> 사진 </div>
+            <div style={{ width: "65%"}}><div style={{fontSize:"20sp", color:"#2d2d2d"}}>홍길동</div><div style={{fontSize:"3px", color:"#5e5e5e"}}>{myAddress}</div>
+            </div>
           </div>
-          <div>{myAddress}</div>
-          {myAddress !== DEFAULT_ADDRESS
-            ? `${myBalance} KLAY`
-            : "지갑 연동 안됨"}
-        </div>
+          <div
+              style={{
+                backgroundColor: "#f5f5f5",
+                minHeight: "110px",
+                marginTop: "10%",
+                padding: "10% 2%"
+              }}
+          >
+            <div>
+              <font style={{
+                  fontSize: 20,
+                  fontWeight: "bold", 
+              }}
+              >
+                내 자산
+              </font>
+            </div>
+            <div style={{
+              padding: "1%",
+              display: "inline-block",
+              whiteSpace: "nowrap",
+              overflow : "hidden",
+              textOverflow : "ellipsis"
+            }}>
+            {myAddress !== DEFAULT_ADDRESS
+              ? `${myBalance} KLAY `
+              : "지갑 연동 안됨"
+            }
+            </div>
+          </div>
+          <div style={{
+            marginTop: "5%",
+            width : "100%",
+            display : "flex"
+          }}
+            onClick= {() => changeWalletDp('OWN')}
+          >
+             <span style={{ padding: "3%", width : "40%" }}>소유한 티켓</span>
+             <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="md" icon={faAngleRight} /></span>
+          </div>
+          <div style={{
+            marginTop: "5%",
+            width : "100%",
+            display : "flex"
+          }}
+          onClick= {() => changeWalletDp('SELL')}
+          >
+             <span style={{ padding: "3%", width : "40%" }}>판매 중인 티켓</span>
+             <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="md" icon={faAngleRight} /></span>
+          </div>
+        </Fragment>
         ) : null}
 
         {myAddress === DEFAULT_ADDRESS ? (
@@ -341,10 +388,25 @@ function App() {
         ) : null}
 
         {/* 갤러리(마켓, 내 지갑) */}
-        {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET" || tab === "WALLET") ? (
+        {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET"|| (tab === "WALLET") && (walletDp === 'OWN' || walletDp === 'SELL')) ? (
+          
+          <Fragment>
+          {tab === "WALLET" || walletDp === 'OWN' || walletDp === 'SELL' ? 
+            <Fragment>
+              <div style={{ marginTop: "5%", display : "flex" }}   onClick={() => {
+                setTab("WALLET");
+                setWalletDp("WALLET");
+                fetchMyNFTs();
+                setQrvalue("DEFAULT")
+              }} >
+                <span style={{ padding: "3%"}}><FontAwesomeIcon color="gray" size="lg" icon={faAngleLeft} /> </span>
+              </div>
+                
+          </Fragment>
+          : ''}
+
           <div className="container" style={{ padding: 0, width: "100%" }}>
             {rows.map((o, rowIndex) => (
-              
               <>
                <Row key={`rowkey${rowIndex}`}>
                 <Col style={{ marginRight: 0, paddingRight: 0, width: "50%" }}>
@@ -391,6 +453,7 @@ function App() {
             
             )} 
           </div>
+         </Fragment>
         ) : null}
 
         {/* 상세 페이지 */}
@@ -402,27 +465,24 @@ function App() {
               <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} style={{width:20}} />
             </div>
             <div><Image src={nft.uri.image} /></div><br/>
-            <div>
-              <span style={{fontSize:22, width:273, fontWeight:"bold"}}>{nft.uri.title}</span> <br/><br/>
-              <div>
-                <span style={{float:"left", width:"30px"}}>{nft.uri.place}</span>
-                {tabBefore === "MARKET" ? <span style={{fontSize:18, color:"#34CD75", fontWeight:"bold", float:"right", width:"100px"}}>{nft.price} KLAY</span> : null}
+            <div className="nftDetailContent">
+              <div style={{color:"#2d2d2d", fontSize:"25px", fontWeight:"600", marginBottom:"5%"}}> {nft.uri.title}</div>
+              <div style={{display:"flex", justifyContent:"space-between"}}>
+                 <div>장소</div> 
+                 <div style={{color:"#34cd75", fontSize:"15px", fontWeight:"600", textAlign:"right"}}>50 KLAY ~</div>
               </div>
-              <br/><br/>
-              <hr/>
-              <span style={{fontWeight:"bold"}}>상세정보</span> <br/>
-              <span>{nft.uri.description}</span> <br/><br/>
-              <span style={{fontWeight:"bold"}}>카테고리</span> <br/>
-              <span>{nft.uri.category == "dining" ? "식사" : (nft.uri.category == "class" ? "쿠킹 클래스" : "리미티드 예약")}</span> <br/><br/>
-              <span style={{fontWeight:"bold"}}>모임일시</span> <br/>
-              <span>{nft.uri.datetime}</span> <br/><br/>
-              <hr/>
-              <br/>
-              <span style={{fontSize:18, fontWeight:"bold"}}>발행정보</span> <br/><br/>
-              <span style={{fontWeight:"bold"}}>토큰ID</span> <br/>
-              <span>{nft.id}</span><br/> <br/>
-              <span style={{fontWeight:"bold"}}>컨트랙트 주소</span> <br/>
-              <span>{MARKET_CONTRACT_ADDRESS}</span><br/><br/><br/>
+              <div className="borderLine"></div>
+     
+              <div><label className="detailLb">상세정보</label><span className="detailCont">{nft.uri.description}</span></div>
+              <div><label className="detailLb">카테고리</label><span className="detailCont"><span className="detailCont">{ nft.uri.category } </span></span></div>
+              <div><label className="detailLb">위치</label><span className="detailCont">{nft.uri.place}</span></div>
+              <div className="borderLine"></div>
+
+              <div style={{color:"#000000", fontSize:"20px",  fontWeight:"600", marginTop:"2%"}}> 발행정보 </div>
+
+                <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">발행일</label><span className="detailCont">{nft.uri.datetime}</span></div>
+                <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">토큰ID</label><span className="detailCont">{nft.id}</span></div>
+                <div style={{color:"#2d2d2d", fontSize:"14sp"}}><label className="detailLb">컨트랙트 주소</label><span className="detailCont">0x12030123y20450</span></div>
             </div>
             <Button
               onClick={() => {
@@ -448,9 +508,11 @@ function App() {
             }}>
               <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} style={{width:20}} />
             </div>
-            <div>
-              <br/>
-              <b style={{fontSize:"20px"}}>판매할 가격을 입력해주세요</b><br/><br/>
+            <div className="nftSellContent">
+              <div>
+                <span style={{fontWeight: "600", fontSize: "20px",}}>판매할 가격을 입력해주세요</span>
+              </div>
+              <div>
               <Form>
                 <span style={{fontSize:"18px", fontWeight:"bold"}}>판매 금액</span><br/><br/>
                 <InputGroup className="mb-3">
@@ -466,20 +528,30 @@ function App() {
                   <InputGroup.Text id="basic-addon2" style={{ width: 100 }}>KLAY</InputGroup.Text>
                 </InputGroup>
               </Form>
-            </div><br/>
-            <p>
-              <span>가격 기준</span><br/>
-              <span>1 KLAY = 1500 원</span><br/>
-              <br/><br/>
-              <span style={{fontSize:"18px", fontWeight:"bold"}}>티켓 정보</span><br/><hr/>
-              <span>{nft.uri.place}</span><br/>
-              <span>{nft.uri.title}</span><br/>
-              <span>{nft.uri.description}</span><br/>
-              <br/>
-              <span style={{fontSize:"18px", fontWeight:"bold"}}>판매 수수료</span><br/><hr/>
-              <span style={{float:"left", width:100}}>결제 금액</span>
-              <span style={{float:"right", width:100}}>0.01 KLAY</span><br/><br/><br/><br/>
-            </p>
+              </div>
+              <div>
+                <label className="detailLb">가격 기준</label>
+                <div style={{display:"flex", justifyContent:"center", border: "1px solid #b5b5b5", textAlign: "cetner", minHeight:"50px", padding: "3%"}}>
+                    <div><span style={{fontSize:"13px", fontWeight:"700"}}>1KLAY</span><span style={{marginLeft:"10%", fontSize: "11px", color:"#252525"}}>(클레이)</span></div>
+                    <div> = </div>
+                    <div><span style={{fontSize:"13px", fontWeight:"700"}}>1,500</span><span style={{marginLeft:"10%", fontSize: "11px", color:"#252525"}}>(원)</span></div>
+                </div>
+                
+              </div>
+              <div>
+                <label className="detailLb">티켓 정보</label>
+                <div className="borderLine"></div>
+                  <span>{nft.uri.title}</span><br/>
+                  <span>{nft.uri.description}</span><br/>
+              </div>
+              <div>
+                <label className="detailLb">판매수수료</label>
+                <div className="borderLine"></div>
+                  <span>{nft.uri.title}</span><br/>
+                  <span>{nft.uri.description}</span><br/>
+              </div>
+            </div>
+          
             <Button
               onClick={() => {
                 onClickTransfer(nft.id);
