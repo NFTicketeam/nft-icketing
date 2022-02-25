@@ -18,6 +18,7 @@
 
 .card-img {
   width: 100%;
+  height: 164px;
 }
 .card-body {
   width: 100%;
@@ -66,4 +67,27 @@
   font-size:  1rem;
   color: #333;
   border-color : #333;
+}
+
+.detailLb {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+}
+
+
+.detailCont {
+  font-size: 12px;
+  font-weight: 300;
+  color: #252525;
+}
+
+.borderLine {
+  min-height: 20px;
+  border-bottom: solid 1px #b5b5b5;
+  margin-bottom: 3%;
+}
+
+.nftDetailContent > div, .nftSellContent > div {
+  margin-bottom: 3%;
 }
