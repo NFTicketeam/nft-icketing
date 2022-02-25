@@ -1,4 +1,4 @@
-# NFT-icketing  
+# Dine - 나만의 특별한 다이닝시간
 
 
 ## Background
