@@ -826,12 +826,12 @@ function App() {
         }}
       >
         <Modal.Header
-          style={{ border: 0, backgroundColor: "#FFFFFF", opacity: 0.8 }}
+          style={{ border: 0, backgroundColor: "#FFFFFF" }}
         >
-          <Modal.Title>{modalProps.title}</Modal.Title>
+          <Modal.Title style={{textAlign:"center"}}>{modalProps.title}</Modal.Title>
         </Modal.Header>
         <Modal.Footer
-          style={{ border: 0, backgroundColor: "#FFFFFF", opacity: 0.8, margin: "auto" }}
+          style={{ border: 0, backgroundColor: "#FFFFFF", margin: "auto" }}
         >
           <Button
             variant="primary"
@@ -853,7 +853,7 @@ function App() {
             아니요
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> 
 
       <Modal
         centered
