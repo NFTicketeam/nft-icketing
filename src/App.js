@@ -41,6 +41,7 @@ function App() {
   const [qrvalue, setQrvalue] = useState(DEFAULT_QR_CODE);
   const [tab, setTab] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL
   const [tabBefore, setTabBefore] = useState("MARKET"); // MARKET, MINT, WALLET, DETAIL, SELL
+  const [mintTokenId, setMintTokenId] = useState("");
   const [mintImageUrl, setMintImageUrl] = useState("");
   const [mintCategory, setMintCategory] = useState("dining");
   const [mintName, setMintName] = useState("");
@@ -147,10 +148,10 @@ function App() {
       return;
     }
 
-    const randomTokenId = parseInt(Math.random() * 10000000);
+    // const randomTokenId = parseInt(Math.random() * 10000000);
     KlipAPI.mintCardWithURI(
       myAddress,
-      randomTokenId,
+      mintTokenId,
       metadataURL,
       setQrvalue,
       (result) => {
@@ -584,6 +585,16 @@ function App() {
             ) : null}
             <Form>
               <Form.Group>
+                <span>토큰ID</span><span>*</span>
+                <Form.Control
+                  value={mintTokenId}
+                  type="text"
+                  placeholder="토큰ID를 입력해 주세요"
+                  onChange={(e) => {
+                    setMintTokenId(e.target.value);
+                  }}
+                />
+                <br/>
                 <span>업체명</span><span>*</span>
                 <Form.Control
                   value={mintName}
