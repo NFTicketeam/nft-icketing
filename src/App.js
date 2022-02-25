@@ -33,7 +33,6 @@ const DEFAULT_ADDRESS = "0x00000000000000000000000000000";
 function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
-  //const [myAddress, setMyAddress] = useState("0x257C15cA1DcDE9bc5512031331Ee1a51115d2491");
   const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
   const [nft, setNft] = useState({id: '1', uri: ''});
 
@@ -399,16 +398,30 @@ function App() {
             <div onClick={() => {
               setTab(tabBefore)
             }}>
-              <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} />
+              <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} style={{width:20}} />
             </div>
-            <div><Image src={nft.uri.image} /></div>
+            <div><Image src={nft.uri.image} /></div><br/>
             <div>
-              {nft.uri.title} <br/>
-              {nft.uri.category} <br/>
-              {nft.uri.datetime} <br/>
-              {nft.uri.description} <br/>
-              {nft.uri.place} <br/>
-              {nft.id}
+              <span style={{fontSize:22, width:273, fontWeight:"bold"}}>{nft.uri.title}</span> <br/><br/>
+              <div>
+                <span style={{float:"left", width:"30px"}}>{nft.uri.place}</span>
+                {tabBefore === "MARKET" ? <span style={{fontSize:18, color:"#34CD75", fontWeight:"bold", float:"right", width:"100px"}}>{nft.price} KLAY</span> : null}
+              </div>
+              <br/><br/>
+              <hr/>
+              <span style={{fontWeight:"bold"}}>상세정보</span> <br/>
+              <span>{nft.uri.description}</span> <br/><br/>
+              <span style={{fontWeight:"bold"}}>카테고리</span> <br/>
+              <span>{nft.uri.category == "dining" ? "식사" : (nft.uri.category == "class" ? "쿠킹 클래스" : "리미티드 예약")}</span> <br/><br/>
+              <span style={{fontWeight:"bold"}}>모임일시</span> <br/>
+              <span>{nft.uri.datetime}</span> <br/><br/>
+              <hr/>
+              <br/>
+              <span style={{fontSize:18, fontWeight:"bold"}}>발행정보</span> <br/><br/>
+              <span style={{fontWeight:"bold"}}>토큰ID</span> <br/>
+              <span>{nft.id}</span><br/> <br/>
+              <span style={{fontWeight:"bold"}}>컨트랙트 주소</span> <br/>
+              <span>{MARKET_CONTRACT_ADDRESS}</span><br/><br/><br/>
             </div>
             <Button
               onClick={() => {
@@ -432,7 +445,7 @@ function App() {
               setTab(tabBefore)
               setTabBefore("WALLET")
             }}>
-              <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} />
+              <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} style={{width:20}} />
             </div>
             <div>
               <b>판매할 가격을 입력해주세요</b><br/>
