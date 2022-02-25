@@ -257,11 +257,6 @@ function App() {
         {tab === "WALLET" && walletDp === 'WALLET' ? (
         // {/* 주소 잔고 */}
         <Fragment>
-          <div style={{display:"flex", marginTop:"10%", minHeight:"100px"}}>
-            <div style={{ width: "25%"}}> 사진 </div>
-            <div style={{ width: "65%"}}><div style={{fontSize:"20sp", color:"#2d2d2d"}}>홍길동</div><div style={{fontSize:"3px", color:"#5e5e5e"}}>{myAddress}</div>
-            </div>
-          </div>
           <div
               style={{
                 backgroundColor: "#f5f5f5",
@@ -279,8 +274,12 @@ function App() {
                 내 자산
               </font>
             </div>
+            <div style={{padding: "0.5%",fontSize:"11px", color:"gray"}}>
+              ${myAddress}
+            </div>
             <div style={{
-              padding: "1%",
+              padding: "0.5%",
+              color:"#34cd75", fontSize:"20px", fontWeight:"600",
               display: "inline-block",
               whiteSpace: "nowrap",
               overflow : "hidden",
@@ -416,7 +415,7 @@ function App() {
         {myAddress !== DEFAULT_ADDRESS && (tab === "MARKET"|| (tab === "WALLET") && (walletDp === 'OWN' || walletDp === 'SELL')) ? (
           
           <Fragment>
-          {tab === "WALLET" || walletDp === 'OWN' || walletDp === 'SELL' ? 
+          {tab === "WALLET" && (walletDp === 'OWN' || walletDp === 'SELL') ? 
             <Fragment>
               <div style={{ marginTop: "5%", display : "flex" }}   onClick={() => {
                 setTab("WALLET");
@@ -468,7 +467,7 @@ function App() {
                         style={{ fontSize: 12, float: "left", color: "gray" }}
                       >
                         {categories.find(o => o.value === nfts[rowIndex * 2].uri.category).name}
-                        {' '} * {nfts[rowIndex * 2].uri.place}
+                        {' '} - {nfts[rowIndex * 2].uri.shop_name}
                       </Card.Text>
 
                     </Card>
@@ -509,7 +508,7 @@ function App() {
                       style={{ fontSize: 12, float: "left", color: "gray" }}
                     >
                       {categories.find(o => o.value === nfts[rowIndex * 2+1].uri.category).name}
-                      {' '} * {nfts[rowIndex * 2+1].uri.place}
+                      {' '} - {nfts[rowIndex * 2+1].uri.shop_name}
                     </Card.Text>
 
                   </Card>
