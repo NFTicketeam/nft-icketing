@@ -301,7 +301,7 @@ function App() {
              <span style={{ padding: "3%", width : "40%" }}>소유한 티켓</span>
              <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="1x" icon={faAngleRight} /></span>
           </div>
-          <div style={{
+          {/* <div style={{
             marginTop: "5%",
             width : "100%",
             display : "flex"
@@ -310,7 +310,7 @@ function App() {
           >
              <span style={{ padding: "3%", width : "40%" }}>판매 중인 티켓</span>
              <span style={{ padding: "3%", width : "60%" }}><FontAwesomeIcon color="gray" size="1x" icon={faAngleRight} /></span>
-          </div>
+          </div> */}
         </Fragment>
         ) : null}
 
