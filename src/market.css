@@ -59,7 +59,9 @@
   background: #000;
   color: gray;
 }
-
+.react-datepicker-ignore-onclickoutside{
+  font-size:  1rem;
+}
 .react-datepicker__input-container::before {
   position: absolute;
   top: 7px;
@@ -90,4 +92,26 @@
 
 .nftDetailContent > div, .nftSellContent > div {
   margin-bottom: 3%;
+}
+
+.solid-border{
+  border-radius: 0.25rem;
+  border : 1px solid #ced4da;
+  text-indent: 10px;
+}
+
+.jb-wrap img {
+  width: 100%;
+  vertical-align: middle;
+}
+
+.jb-text p {
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  width: 50%;
+  margin: -27.5px 5px;
+  padding: 10px;
+  background-color: transparent;
+  text-align: left;
 }

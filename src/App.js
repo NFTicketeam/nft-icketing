@@ -36,7 +36,7 @@ const DEFAULT_ADDRESS = "0x00000000000000000000000000000";
 function App() {
   const [nfts, setNfts] = useState([]); // {id: '101', uri: ''}
   const [myBalance, setMyBalance] = useState("0");
-  const [myAddress, setMyAddress] = useState("0x00000000000000000000000000000");
+  const [myAddress, setMyAddress] = useState("0x257C15cA1DcDE9bc5512031331Ee1a51115d2491");
 
   const [nft, setNft] = useState({ id: '1', uri: '' });
 
@@ -441,14 +441,13 @@ function App() {
                       }}
                     >
                       <Card.Img src={nfts[rowIndex * 2].uri.image} />
-                      <Card.Body style={{ marginBottom: 0 }} >
-                        <Card.Text
-                          style={{ backgroundColor: "black", width: 30, fontSize: 10, textAlign: "center", float: "left", color: "white" }}
-                        >
-                          {nfts[rowIndex * 2 ].uri.datetime.split('/')[0] +'/'+ nfts[rowIndex * 2 ].uri.datetime.split('/')[1]}
-                        </Card.Text>
-                      </Card.Body>
-
+                        <div class="jb-image">
+                          <img src="drawable-hdpi/frame_6.png" style={{width:45, height:16}}/>
+                        </div>
+                        <div class="jb-text">
+                            <p>{nfts[rowIndex * 2 ].uri.datetime.split('/')[0] +'/'+ nfts[rowIndex * 2 ].uri.datetime.split('/')[1]}</p>
+                        </div>
+                        
                       <Card.Text
                         style={{ fontSize: 15, float: "left", fontWeight: "bold" }}
                       >
@@ -486,13 +485,12 @@ function App() {
                     }}
                   >
                     <Card.Img src={nfts[rowIndex * 2].uri.image} />
-                    <Card.Body style={{ marginBottom: 0 }} >
-                      <Card.Text
-                        style={{ backgroundColor: "black", width: 30, fontSize: 10, textAlign: "center", float: "left", color: "white" }}
-                      >
-                        {nfts[rowIndex * 2 +1 ].uri.datetime.split('/')[0] +'/'+ nfts[rowIndex * 2 +1].uri.datetime.split('/')[1]}
-                      </Card.Text>
-                    </Card.Body>
+                    <div class="jb-image">
+                          <img src="drawable-hdpi/frame_6.png" style={{width:45, height:16}}/>
+                        </div>
+                        <div class="jb-text">
+                            <p>{nfts[rowIndex * 2 +1].uri.datetime.split('/')[0] +'/'+ nfts[rowIndex * 2+1 ].uri.datetime.split('/')[1]}</p>
+                        </div>
 
                     <Card.Text
                       style={{ fontSize: 15, float: "left", fontWeight: "bold" }}
@@ -716,8 +714,9 @@ function App() {
                   selected={mintDatetime}
                   onChange={(date) => setMintDatetime(date)}
                   placeholderText="  날짜를 입력해 주세요."
-                  className="red-border"
+                  className="solid-border"
                 />
+                <br />
                 <br />
                 <span>티켓 소개</span><span>*</span>
                 <Form.Control
