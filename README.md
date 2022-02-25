@@ -1,6 +1,9 @@
 # Dine - 나만의 특별한 다이닝시간
 
 
+![Frame 89](https://user-images.githubusercontent.com/97182033/155728940-b0efbefd-43be-42e8-978b-3ebace2dc4cb.png)
+
+
 ## Background
 
 
