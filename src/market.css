@@ -5,8 +5,6 @@
   font-weight: bold;
 }
 
-
-
 .card {
   width: 100%;
   margin: 10px auto;
@@ -14,8 +12,8 @@
   overflow: hidden;
   cursor: pointer;
   transition: 0.4s;
-  border-color: white;
-  align-items: center;
+  border-color: black;
+  word-spacing: -2%;
 }
 
 .card-img {

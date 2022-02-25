@@ -1,10 +1,12 @@
 import Caver from "caver-js";
 import KIP17ABI from "../abi/KIP17TokenABI.json";
+import MarketABI from "../abi/MarketABI.json";
 import axios from "axios";
 import {
   ACCESS_KEY_ID,
   SECRET_ACCESS_KEY,
   NFT_CONTRACT_ADDRESS,
+  MARKET_CONTRACT_ADDRESS,
   CHAIN_ID,
 } from "../constants";
 const option = {
@@ -26,6 +28,29 @@ const caver = new Caver(
   )
 );
 const NFTContract = new caver.contract(KIP17ABI, NFT_CONTRACT_ADDRESS);
+const MarketContract = new caver.contract(MarketABI, MARKET_CONTRACT_ADDRESS);
+
+export const getPriceOf = async (tokenId) => {
+  const price = await MarketContract.methods.getPrice(tokenId).call();
+  console.log(`[PRICE] : ${price}`)
+  return price
+}
+
+export const sellCardOf = async (tokenId, price) => {
+  try {
+    const privatekey = '0x9851da56f1d0d6369fe4b92b477f7fa702f509b2e80f1790ac40cd2aca3d05c4';
+    const deployer = caver.wallet.keyring.createFromPrivateKey(privatekey);
+    caver.wallet.add(deployer);
+
+    const receipt = await MarketContract.methods.sellNFT(tokenId, caver.utils.convertToPeb(price)).send({
+      from: deployer.address, // address
+      gas: "1000000"
+    })
+    console.log(receipt);
+  } catch(e) {
+    console.log(`[ERROR_SELL_CARD]${e}`);
+  }
+}
 
 export const fetchCardsOf = async (address) => {
   // Fetch Balance
@@ -44,8 +69,8 @@ export const fetchCardsOf = async (address) => {
     const metadataUrl = await NFTContract.methods.tokenURI(tokenIds[i]).call(); // -> metadata
     const response = await axios.get(metadataUrl);
     const uriJSON = response.data;
-    //tokenUris.push(uriJSON);
-    tokenUris.push(metadataUrl);
+    tokenUris.push(uriJSON);
+    //tokenUris.push(metadataUrl);
   }
   const nfts = [];
   for (let i = 0; i < balance; i++) {
