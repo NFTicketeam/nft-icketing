@@ -119,7 +119,9 @@ function App() {
       return;
     }
     const _nfts = await fetchCardsOf(myAddress);
-    setNfts(_nfts);
+    _.map(_nfts, (i) => {
+      i["categoryKor"] = _.filter(categories, (ctg) => {return ctg.value === i.uri.category})[0].name;
+    })
   };
 
   const onClickMintButton = (image, name, category, title, datetime, description, place) => {
@@ -544,14 +546,17 @@ function App() {
               <div>
                 <label className="detailLb" style={{marginTop:"10%"}}>티켓 정보</label>
                 <div className="borderLine"></div>
-                  <span>{nft.uri.title}</span><br/>
-                  <span>{nft.uri.description}</span><br/>
+                  <div>■ 발행점포명 </div>
+                  <div style={{fontWeight:"600" , fontSize:"15px"}}>{nft.uri.title}</div>
+                  <div style={{fontWeight:"540" , fontSize:"13px"}}>{nft.uri.place}</div>
               </div>
               <div>
                 <label className="detailLb" style={{marginTop:"10%"}}>판매수수료</label>
                 <div className="borderLine"></div>
-                  <span>{nft.uri.title}</span><br/>
-                  <span>{nft.uri.description}</span><br/>
+                <div style={{display:"flex", justifyContent:"space-between"}}>
+                    <div style={{fontWeight:"bold" , fontSize:"13px"}}>수수료 금액</div>
+                    <div style={{fontWeight:"540" , fontSize:"13px", textAlign:"right"}}>0.01 KLAY</div>
+                </div>
               </div>
             </div>
           
