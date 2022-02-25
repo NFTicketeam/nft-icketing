@@ -72,6 +72,6 @@
   margin-bottom: 5%;
 }
 
-.nftDetailContent > div {
+.nftDetailContent > div, .nftSellContent > div {
   margin-bottom: 3%;
 }

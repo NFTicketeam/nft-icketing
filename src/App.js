@@ -494,37 +494,48 @@ function App() {
         {/* 판매 페이지 */}
         {myAddress !== DEFAULT_ADDRESS && tab === "SELL" ? (
           <div className="container" style={{ padding: 0, width: "100%" }}>
-            <div onClick={() => {
+            <div style={{marginBottom:"5%"}} 
+              onClick={() => {
               setTab(tabBefore)
               setTabBefore("WALLET")
             }}>
               <FontAwesomeIcon color="black" size="lg" icon={faArrowLeft} />
             </div>
-            <div>
-              <b>판매할 가격을 입력해주세요</b><br/>
-              <Form>
-                <span>판매 금액</span>
-                <InputGroup className="mb-3">
-                  <FormControl
-                    value={sellPrice}
-                    placeholder="0"
-                    type="number"
-                    onChange={(e) => {
-                      setSellPrice(e.target.value);
-                    }}
-                  />
-                  <InputGroup.Text id="basic-addon2">KLAY</InputGroup.Text>
-                </InputGroup>
-              </Form>
+            <div className="nftSellContent">
+              <div>
+                <span style={{fontWeight: "600", fontSize: "20px",}}>판매할 가격을 입력해주세요</span>
+              </div>
+              <div>
+                <label className="detailLb" id="sellPrice">판매 금액</label>
+                    <input type="text" 
+                           className="mb-3"
+                           placeholder="0" 
+                           value={sellPrice} 
+                           onChange={(e) => {
+                            setSellPrice(e.target.value);
+                          }}
+                    />                      
+              </div>
             </div>
-            <p>
-              <span>가격 기준</span><br/>
-              <span>1 KLAY = 1500 원</span><br/>
-              <br/>
+            <div>
+              <div>
+                <label className="detailLb">가격 기준</label>
+                <div style={{display:"flex", justifyContent:"center", border: "1px solid #b5b5b5", textAlign: "cetner", minHeight:"50px", padding: "3%"}}>
+                    <div><span style={{fontSize:"13px", fontWeight:"700"}}>1KLAY</span><span style={{marginLeft:"20%", fontSize: "11px", color:"#252525"}}>(클레이)</span></div>
+                    <div> = </div>
+                    <div><span style={{fontSize:"13px", fontWeight:"700"}}>1,500</span><span style={{marginLeft:"20%", fontSize: "11px", color:"#252525"}}>(원)</span></div>
+                </div>
+                
+              </div>
+              <div>
+                <span>티켓 정보</span><br/>
+                <span>{nft.uri.title}</span><br/>
+                <span>{nft.uri.description}</span><br/>
+              </div>
+              <div>
               <span>티켓 정보</span><br/>
-              <span>{nft.uri.title}</span><br/>
-              <span>{nft.uri.description}</span><br/>
-            </p>
+              </div>
+            </div>
             <Button
               onClick={() => {
                 onClickTransfer(nft.id);
