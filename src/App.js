@@ -474,7 +474,7 @@ function App() {
             <div className="nftDetailContent">
               <div style={{color:"#2d2d2d", fontSize:"25px", fontWeight:"600", marginBottom:"5%"}}> {nft.uri.title}</div>
               <div style={{display:"flex", justifyContent:"space-between"}}>
-                 <div>장소</div> 
+                 <div> ■ { nft.uri.shop_name} </div> 
                  <div style={{color:"#34cd75", fontSize:"15px", fontWeight:"600", textAlign:"right"}}> {nft.price} KLAY ~</div>
               </div>
               <div className="borderLine"></div>
@@ -547,7 +547,7 @@ function App() {
               <div>
                 <label className="detailLb" style={{marginTop:"10%"}}>티켓 정보</label>
                 <div className="borderLine"></div>
-                  <div>■ 발행점포명 </div>
+                  <div>■ {nft.uri.shop_name} </div>
                   <div style={{fontWeight:"600" , fontSize:"15px"}}>{nft.uri.title}</div>
                   <div style={{fontWeight:"540" , fontSize:"13px"}}>{nft.uri.place}</div>
               </div>
